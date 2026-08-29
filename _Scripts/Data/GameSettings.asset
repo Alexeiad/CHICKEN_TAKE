@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 626a323425682dc46b63d4a2b18283c0, type: 3}
+  m_Name: GameSettings
+  m_EditorClassIdentifier: 
+  Camera:
+    Sensitivity: 2
+    Distance: 5
+    TargetOffset: {x: 0, y: 1.5, z: 0}
+    VerticalLimits: {x: -45, y: 45}
+    Key: 118
+    Mode: 1
+    MaxDistance: 5
+    MinDistance: 0.01
+  Player:
+    Speed: 5
+    Gravity: -9.81
+  Chicken:
+    TurnSpeed: 8
+    Gravity: -9.81
+    GroundedStickyVelocity: -2
+    DirectionEpsilon: 0.0001
+    DistanceVariance: 5
+    FleeAngleVariance: 20
+    IndividualSpeedMultiplierRange: {x: 0.85, y: 1.15}
+    WalkProfile:
+      ARange: {x: 0.1, y: 0.4}
+      BRange: {x: 0.8, y: 1.5}
+      MaxSpeed: 2.5
+    FleeProfile:
+      ARange: {x: 1, y: 2.5}
+      BRange: {x: 3, y: 4.5}
+      MaxSpeed: 20
+    SeekFoodProfile:
+      ARange: {x: 0.3, y: 0.8}
+      BRange: {x: 1.5, y: 2.2}
+      MaxSpeed: 4
+    FleeDistance: 15
+    CalmDistance: 20
+    EatingTimeRange: {x: 2, y: 5}
+    StandingTimeRange: {x: 1.5, y: 3}
+    WalkingTimeRange: {x: 3, y: 6}
