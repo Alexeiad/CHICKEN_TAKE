@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.02.00">
+	<object class="AudioFile" id="{0ee4bb57-2418-4111-a645-93978b0ae64a}">
+		<property name="assetPath">
+			<value>Arena_Rock_Stomp the Field.mp3</value>
+		</property>
+		<property name="isStreaming">
+			<value>true</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>48</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>119.76000000000001</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{f0bc5d1b-f018-4d91-ad00-225f8457bfd8}</destination>
+		</relationship>
+	</object>
+</objects>
