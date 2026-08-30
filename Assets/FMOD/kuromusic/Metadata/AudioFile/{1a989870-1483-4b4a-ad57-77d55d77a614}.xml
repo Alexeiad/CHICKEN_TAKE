@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.02.00">
+	<object class="AudioFile" id="{1a989870-1483-4b4a-ad57-77d55d77a614}">
+		<property name="assetPath">
+			<value>Arena_result_Tractor_ Turnaround.mp3</value>
+		</property>
+		<property name="isStreaming">
+			<value>true</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>48</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>40.247999999999998</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{f0bc5d1b-f018-4d91-ad00-225f8457bfd8}</destination>
+		</relationship>
+	</object>
+</objects>
