@@ -769,6 +769,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4785590452333129595}
+  - component: {fileID: 9100000000000000100}
   m_Layer: 0
   m_Name: MENU_INSTANCE
   m_TagString: Untagged
@@ -7852,3 +7853,160 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 702920635246478259, guid: 3a26a13d941c3c34c8925acbd2c5a005, type: 3}
   m_PrefabInstance: {fileID: 8652031094828939261}
   m_PrefabAsset: {fileID: 0}
+
+--- !u!114 &9100000000000000101 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1087133551239861809, guid: f55ab861b15cff348bbb8cb860a7d618, type: 3}
+  m_PrefabInstance: {fileID: 3873498494976158815}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+
+--- !u!114 &9100000000000000102 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3186171840298968574, guid: f55ab861b15cff348bbb8cb860a7d618, type: 3}
+  m_PrefabInstance: {fileID: 3873498494976158815}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+
+--- !u!114 &9100000000000000103 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1647927406223445752, guid: f55ab861b15cff348bbb8cb860a7d618, type: 3}
+  m_PrefabInstance: {fileID: 3873498494976158815}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+
+--- !u!114 &9100000000000000104 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6185619457533958288, guid: f55ab861b15cff348bbb8cb860a7d618, type: 3}
+  m_PrefabInstance: {fileID: 3873498494976158815}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+
+--- !u!114 &9100000000000000105 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3781229934587422462, guid: f55ab861b15cff348bbb8cb860a7d618, type: 3}
+  m_PrefabInstance: {fileID: 3873498494976158815}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b743370ac3e4ec2a1668f5455a8ef8a, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+
+--- !u!114 &9100000000000000100
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 400515625921834987}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0e1b7c6a9234d7f8cf1e266db130245, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  translations: {fileID: 11400000, guid: be4e90e8ae7f49b389c7ac65fd6d5ab2, type: 2}
+  language: 0
+  texts:
+  - key: settingsText
+    tmpText: {fileID: 7599477103362627129}
+    legacyText: {fileID: 0}
+  - key: exitText
+    tmpText: {fileID: 7098976654691770338}
+    legacyText: {fileID: 0}
+  - key: playText
+    tmpText: {fileID: 1992293952654033911}
+    legacyText: {fileID: 0}
+  - key: slot2Text
+    tmpText: {fileID: 5071177064852152886}
+    legacyText: {fileID: 0}
+  - key: soundVolumeText
+    tmpText: {fileID: 2955182375744094902}
+    legacyText: {fileID: 0}
+  - key: authorsText
+    tmpText: {fileID: 2983365658548573098}
+    legacyText: {fileID: 0}
+  - key: brightnessText
+    tmpText: {fileID: 0}
+    legacyText: {fileID: 2473903753567770107}
+  - key: createSaveText
+    tmpText: {fileID: 558181434003744804}
+    legacyText: {fileID: 0}
+  - key: musicVolumeText
+    tmpText: {fileID: 7899043465847918084}
+    legacyText: {fileID: 0}
+  - key: settingsText
+    tmpText: {fileID: 4517079078175696046}
+    legacyText: {fileID: 0}
+  - key: createSaveText
+    tmpText: {fileID: 2886049354895272568}
+    legacyText: {fileID: 0}
+  - key: savesText
+    tmpText: {fileID: 6007483044210603219}
+    legacyText: {fileID: 0}
+  - key: resolutionText
+    tmpText: {fileID: 0}
+    legacyText: {fileID: 5431184598239142556}
+  - key: loadText
+    tmpText: {fileID: 5002777333404006652}
+    legacyText: {fileID: 0}
+  - key: qualityText
+    tmpText: {fileID: 0}
+    legacyText: {fileID: 3203444222199133352}
+  - key: graphicsText
+    tmpText: {fileID: 0}
+    legacyText: {fileID: 5766576002491374851}
+  - key: slot1Text
+    tmpText: {fileID: 4929945398163830897}
+    legacyText: {fileID: 0}
+  - key: volumeText
+    tmpText: {fileID: 8086620295317405914}
+    legacyText: {fileID: 0}
+  - key: slot3Text
+    tmpText: {fileID: 58318251304176387}
+    legacyText: {fileID: 0}
+  - key: authorsText
+    tmpText: {fileID: 4960236176958844319}
+    legacyText: {fileID: 0}
+  - key: createSaveText
+    tmpText: {fileID: 1200667668526748739}
+    legacyText: {fileID: 0}
+  - key: backText
+    tmpText: {fileID: 0}
+    legacyText: {fileID: 5471226631973759917}
+  - key: cameraDistanceText
+    tmpText: {fileID: 9100000000000000101}
+    legacyText: {fileID: 0}
+  - key: cameraSettingsText
+    tmpText: {fileID: 9100000000000000102}
+    legacyText: {fileID: 0}
+  - key: viewKeyText
+    tmpText: {fileID: 9100000000000000103}
+    legacyText: {fileID: 0}
+  - key: sensitivityText
+    tmpText: {fileID: 9100000000000000104}
+    legacyText: {fileID: 0}
+  menuCanvas: {fileID: 6799600198027169879}
+  languageFont: {fileID: 11400000, guid: 020df937a954dea40a29c0ece6110d02, type: 2}
+  cameraModeDropdown: {fileID: 9100000000000000105}
