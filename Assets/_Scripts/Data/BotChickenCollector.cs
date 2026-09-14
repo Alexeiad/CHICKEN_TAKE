@@ -13,6 +13,9 @@ public class BotChickenCollector : MonoBehaviour
     [SerializeField] private Transform _sellPoint;
     [SerializeField] private float _sellDistance = 2.0f;
 
+    [Header("Chicken")]
+    [SerializeField] private int _maxCollectedCount = 15;
+
     private int _collectedCount;
 
     private IEntityRegistry<IEntity> _entityRegistry;
@@ -22,8 +25,13 @@ public class BotChickenCollector : MonoBehaviour
     private BotDataSO _data;
 
     public int CollectedCount => _collectedCount;
+    public int MaxCollectedCount => _maxCollectedCount;
     public BotDataSO Data => _data;
 
+    public string CollectedCountText =>
+        $"{_collectedCount}/{_maxCollectedCount}";
+
+    public event Action OnChickenCountChanged;
     public event Action<int, int> OnSell;
 
     [Inject]
@@ -50,6 +58,9 @@ public class BotChickenCollector : MonoBehaviour
 
     private void CheckForChicken()
     {
+        if (_collectedCount >= _maxCollectedCount)
+            return;
+
         Transform origin = _rayOrigin != null
             ? _rayOrigin
             : transform;
@@ -70,12 +81,17 @@ public class BotChickenCollector : MonoBehaviour
 
     private void Collect(Chicken chicken)
     {
+        if (_collectedCount >= _maxCollectedCount)
+            return;
+
         if (chicken is IEntity entity)
             _entityRegistry?.Unregister(entity);
 
         _collectedCount++;
 
         _data.Chicken = _collectedCount;
+
+        OnChickenCountChanged?.Invoke();
 
         Destroy(chicken.gameObject);
     }
@@ -110,6 +126,8 @@ public class BotChickenCollector : MonoBehaviour
         _data.Chicken = 0;
         _data.Cash += coinsEarned;
 
+        OnChickenCountChanged?.Invoke();
+
         OnSell?.Invoke(
             coinsEarned,
             chickensSold
@@ -133,5 +151,7 @@ public class BotChickenCollector : MonoBehaviour
         _collectedCount -= amount;
 
         _data.Chicken = _collectedCount;
+
+        OnChickenCountChanged?.Invoke();
     }
 }

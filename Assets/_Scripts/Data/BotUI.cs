@@ -35,7 +35,6 @@ public class BotUI : MonoBehaviour
             return;
         }
 
-        // BotChickenCollector.Awake() уже гарантированно отработал.
         _data = _collector.Data;
 
         if (_data == null)
@@ -49,6 +48,7 @@ public class BotUI : MonoBehaviour
         }
 
         _data.OnDataChanged += UpdateUI;
+        _collector.OnChickenCountChanged += UpdateUI;
         _collector.OnSell += OnSell;
 
         UpdateUI();
@@ -61,18 +61,21 @@ public class BotUI : MonoBehaviour
             _data.OnDataChanged -= UpdateUI;
 
         if (_collector != null)
+        {
+            _collector.OnChickenCountChanged -= UpdateUI;
             _collector.OnSell -= OnSell;
+        }
     }
 
     private void UpdateUI()
     {
-        if (_data == null)
+        if (_collector == null)
             return;
 
         if (_chickenText != null)
-            _chickenText.text = _data.Chicken.ToString();
+            _chickenText.text = _collector.CollectedCountText;
 
-        if (_showCash && _cashText != null)
+        if (_showCash && _cashText != null && _data != null)
             _cashText.text = _data.Cash.ToString();
     }
 

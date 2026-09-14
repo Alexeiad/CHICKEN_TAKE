@@ -10,6 +10,9 @@ public class PlayerUI : UIBase
     [SerializeField] private TMP_Text _cashText;
     [SerializeField] private TMP_Text _chickenText;
 
+    [Header("Chicken Collection")]
+    [SerializeField] private int _maxChickenCount = 15;
+
     [Header("Zone Event")]
     [SerializeField] private PlayerZoneEventSO _zoneEvent;
 
@@ -50,7 +53,7 @@ public class PlayerUI : UIBase
             _cashText.text = _data.Cash.ToString();
 
         if (_chickenText != null)
-            _chickenText.text = _data.Chicken.ToString();
+            _chickenText.text = $"{_data.Chicken}/{_maxChickenCount}";
     }
 
     private void SetInteractionObjectActive(bool isActive)

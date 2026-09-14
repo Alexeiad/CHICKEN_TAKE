@@ -336,6 +336,7 @@ MonoBehaviour:
     m_Bits: 4294967295
   _sellPoint: {fileID: 0}
   _sellDistance: 25
+  _maxCollectedCount: 15
 --- !u!1 &1497017933845941399
 GameObject:
   m_ObjectHideFlags: 0
@@ -2276,12 +2277,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1532a9d13d4abf840a40e99b85c0f73b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _coinsNotificationText: {fileID: 2558678538438498046}
-  _chickensNotificationText: {fileID: 8988302770840865039}
   _collector: {fileID: 888793556825855375}
   _chickenText: {fileID: 8180984788940432802}
   _showCash: 0
   _cashText: {fileID: 2558678538438498046}
+  _coinsNotificationText: {fileID: 2558678538438498046}
+  _chickensNotificationText: {fileID: 8988302770840865039}
 --- !u!1 &8100743832679921003
 GameObject:
   m_ObjectHideFlags: 0
