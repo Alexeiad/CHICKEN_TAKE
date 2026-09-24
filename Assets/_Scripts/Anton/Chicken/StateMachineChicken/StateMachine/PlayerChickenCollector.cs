@@ -18,8 +18,7 @@ public class PlayerChickenCollector : ChickenCollectorBase
     {
         if (_data != null)
         {
-            _data.Chicken = _collectedCount;
-            _data.InvokeDataChanged();
+            _data.RecordCollection(_collectedCount);
         }
     }
 
@@ -27,9 +26,7 @@ public class PlayerChickenCollector : ChickenCollectorBase
     {
         if (_data != null)
         {
-            _data.Cash += coinsEarned;
-            _data.Chicken = 0;
-            _data.InvokeDataChanged();
+            _data.RecordSale(coinsEarned, chickensSold);
         }
         _zoneEvent?.Sell(coinsEarned, chickensSold);
     }

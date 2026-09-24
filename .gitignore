@@ -2,3 +2,11 @@
 /Logs
 /ProjectSettings
 /UserSettings
+
+# Unity and IDE generated files
+/[Tt]emp/
+/[Oo]bj/
+/.vs/
+/*.csproj
+/*.sln
+/fmod_editor.log

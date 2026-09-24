@@ -1,0 +1,115 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd3457a683da4f8c863b1e1dac925a71, type: 3}
+  m_Name: MenuTranslations
+  m_EditorClassIdentifier: 
+  entries:
+  - key: playText
+    russian: "Играть"
+    english: "Play"
+    german: "Spielen"
+  - key: settingsText
+    russian: "Настройки"
+    english: "Settings"
+    german: "Einstellungen"
+  - key: exitText
+    russian: "Выйти"
+    english: "Quit"
+    german: "Beenden"
+  - key: authorsText
+    russian: "Авторы"
+    english: "Credits"
+    german: "Mitwirkende"
+  - key: savesText
+    russian: "Сохранения"
+    english: "Saved games"
+    german: "Spielstände"
+  - key: loadText
+    russian: "Загрузить"
+    english: "Load"
+    german: "Laden"
+  - key: slot1Text
+    russian: "Слот 1"
+    english: "Slot 1"
+    german: "Spielstand 1"
+  - key: slot2Text
+    russian: "Слот 2"
+    english: "Slot 2"
+    german: "Spielstand 2"
+  - key: slot3Text
+    russian: "Слот 3"
+    english: "Slot 3"
+    german: "Spielstand 3"
+  - key: createSaveText
+    russian: "Нажмите, чтобы создать новое сохранение"
+    english: "Click to create a new save"
+    german: "Klicken, um einen neuen Spielstand anzulegen"
+  - key: volumeText
+    russian: "Громкость"
+    english: "Volume"
+    german: "Lautstärke"
+  - key: musicVolumeText
+    russian: "Громкость музыки"
+    english: "Music volume"
+    german: "Musiklautstärke"
+  - key: soundVolumeText
+    russian: "Громкость звуков"
+    english: "Sound volume"
+    german: "Effektlautstärke"
+  - key: brightnessText
+    russian: "Настройки яркости экрана"
+    english: "Screen brightness"
+    german: "Bildschirmhelligkeit"
+  - key: resolutionText
+    russian: "Настройки разрешения экрана"
+    english: "Screen resolution"
+    german: "Bildschirmauflösung"
+  - key: qualityText
+    russian: "Качество графики"
+    english: "Graphics quality"
+    german: "Grafikqualität"
+  - key: graphicsText
+    russian: "ГРАФИКА"
+    english: "GRAPHICS"
+    german: "GRAFIK"
+  - key: backText
+    russian: "Вернуться"
+    english: "Back"
+    german: "Zurück"
+  - key: cameraDistanceText
+    russian: "Расстояние камеры"
+    english: "Camera distance"
+    german: "Kameraabstand"
+  - key: cameraSettingsText
+    russian: "Настройки камеры"
+    english: "Camera settings"
+    german: "Kameraeinstellungen"
+  - key: viewKeyText
+    russian: "Клавиша вида"
+    english: "View key"
+    german: "Perspektivtaste"
+  - key: sensitivityText
+    russian: "Чувствительность"
+    english: "Sensitivity"
+    german: "Empfindlichkeit"
+  - key: firstPersonText
+    russian: "От первого лица"
+    english: "First person"
+    german: "Ego-Perspektive"
+  - key: thirdPersonText
+    russian: "От третьего лица"
+    english: "Third person"
+    german: "Dritte Person"
+  - key: languageText
+    russian: "Язык: Русский"
+    english: "Language: English"
+    german: "Sprache: Deutsch"
