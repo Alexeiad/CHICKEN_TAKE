@@ -1,4 +1,7 @@
-/Library
-/Logs
-/ProjectSettings
-/UserSettings
+/Library/
+/Temp/
+/obj/
+/Logs/
+/UserSettings/
+/.vs/
+fmod_editor.log
