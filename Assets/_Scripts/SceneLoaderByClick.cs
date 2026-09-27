@@ -7,6 +7,7 @@ public class SceneLoaderByClick : MonoBehaviour
 
     private void Update()
     {
+        if (InformationPointUI.BlocksGameplayInput) return;
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
@@ -16,6 +17,7 @@ public class SceneLoaderByClick : MonoBehaviour
 
     public void OnClick()
     {
+        if (InformationPointUI.BlocksGameplayInput) return;
         BootstrapLoader.TargetSceneIndex = _sceneIndex;
         SceneManager.LoadScene(0);
     }

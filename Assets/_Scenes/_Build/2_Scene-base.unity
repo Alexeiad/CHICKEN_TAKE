@@ -22553,7 +22553,7 @@ MonoBehaviour:
   _openDelay: 0.15
   _interactionKey: 102
   _buildingMenus: {fileID: 11400000, guid: 7d9755fd451a42ca826fd02123c3ee17, type: 2}
-  _building: 1
+  _building: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

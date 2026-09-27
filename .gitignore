@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /Library/
 /Temp/
 /obj/
@@ -5,3 +6,17 @@
 /UserSettings/
 /.vs/
 fmod_editor.log
+=======
+/Library
+/Logs
+/ProjectSettings
+/UserSettings
+
+# Unity and IDE generated files
+/[Tt]emp/
+/[Oo]bj/
+/.vs/
+/*.csproj
+/*.sln
+/fmod_editor.log
+>>>>>>> 13196db7ae26269bd7c1ef22359902a8170b2878

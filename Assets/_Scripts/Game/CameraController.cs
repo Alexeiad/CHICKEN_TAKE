@@ -29,6 +29,7 @@ public class CameraController : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (InformationPointUI.BlocksGameplayInput) return;
         Rotation();
         View();
     }

@@ -1,35 +1,12 @@
-
 using System.Linq;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using Zenject;
 
 public class InformationPointUI : MonoBehaviour
 {
     [SerializeField] private GameObject _canvas;
-<<<<<<< Updated upstream
-    [SerializeField] private float _interactionDistance = 2f;
-    [SerializeField] private float _openDelay = 0.5f;
-
-    [Inject] private IEntityRegistry<IEntity> _registry;
-
-    private Player _player;
-    private Camera _camera;
-
-    private bool _isOpen;
-    private float _moveToCenterTimer;
-
-    private Vector3 _previousPlayerPosition;
-
-    private Vector3 _cameraPosition;
-    private Quaternion _cameraRotation;
-
-    private CursorLockMode _previousCursorLockState;
-    private bool _previousCursorVisible;
-
-    private void Awake()
-    {
-        _canvas.SetActive(false);
-=======
     [SerializeField] private float _interactionDistance = 5f;
     [SerializeField] private float _openDelay = .5f;
     [SerializeField] private KeyCode _interactionKey = KeyCode.F;
@@ -68,84 +45,12 @@ public class InformationPointUI : MonoBehaviour
     {
         if (_canvas != null)
             _canvas.SetActive(false);
->>>>>>> Stashed changes
     }
 
     private void Update()
     {
-        if (_player == null)
+        if (IsOpen)
         {
-<<<<<<< Updated upstream
-            _player = _registry.AllEntities
-                .OfType<Player>()
-                .FirstOrDefault();
-
-            if (_player == null)
-                return;
-
-            _previousPlayerPosition = _player.transform.position;
-            return;
-        }
-
-        Vector3 currentPosition = _player.transform.position;
-        Vector3 movement = currentPosition - _previousPlayerPosition;
-
-        _previousPlayerPosition = currentPosition;
-
-        float distance = Vector3.Distance(
-            transform.position,
-            currentPosition
-        );
-
-        if (distance > _interactionDistance)
-        {
-            _moveToCenterTimer = 0f;
-
-            if (_isOpen)
-                Close();
-
-            return;
-        }
-
-        if (_isOpen)
-            return;
-
-        movement.y = 0f;
-
-        if (movement.sqrMagnitude <= 0.000001f)
-        {
-            _moveToCenterTimer = 0f;
-            return;
-        }
-
-        Vector3 toCenter = transform.position - currentPosition;
-        toCenter.y = 0f;
-
-        if (toCenter.sqrMagnitude <= 0.000001f)
-        {
-            _moveToCenterTimer = 0f;
-            return;
-        }
-
-        float direction = Vector3.Dot(
-            movement.normalized,
-            toCenter.normalized
-        );
-
-        if (direction <= 0f)
-        {
-            _moveToCenterTimer = 0f;
-            return;
-        }
-
-        _moveToCenterTimer += Time.deltaTime;
-
-        if (_moveToCenterTimer >= _openDelay)
-        {
-            _moveToCenterTimer = 0f;
-            Open();
-        }
-=======
             HandleOpenState();
             return;
         }
@@ -181,19 +86,13 @@ public class InformationPointUI : MonoBehaviour
 
     private void HandleOpenState()
     {
-        if (!Input.GetKeyDown(_interactionKey) &&
-            !Input.GetKeyDown(KeyCode.Escape))
-        {
+        if (!Input.GetKeyDown(KeyCode.Escape))
             return;
-        }
 
         if (view != null)
-        {
             view.Back();
-            return;
-        }
-
-        Close();
+        else
+            Close();
     }
 
     private void UpdatePlayer()
@@ -242,23 +141,10 @@ public class InformationPointUI : MonoBehaviour
 
         return delta.sqrMagnitude <=
                _interactionDistance * _interactionDistance;
->>>>>>> Stashed changes
     }
 
-    private void Open()
+    public void Open()
     {
-<<<<<<< Updated upstream
-        _camera = Camera.main;
-
-        if (_camera == null)
-            return;
-
-        _cameraPosition = _camera.transform.position;
-        _cameraRotation = _camera.transform.rotation;
-
-        _previousCursorLockState = Cursor.lockState;
-        _previousCursorVisible = Cursor.visible;
-=======
         if (BlocksGameplayInput)
             return;
 
@@ -282,27 +168,10 @@ public class InformationPointUI : MonoBehaviour
         active = this;
 
         Time.timeScale = 0f;
->>>>>>> Stashed changes
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
-<<<<<<< Updated upstream
-        _canvas.SetActive(true);
-
-        _isOpen = true;
-    }
-
-    private void LateUpdate()
-    {
-        if (!_isOpen || _camera == null)
-            return;
-
-        _camera.transform.SetPositionAndRotation(
-            _cameraPosition,
-            _cameraRotation
-        );
-=======
         ShowPrompt(false);
 
         try
@@ -324,25 +193,10 @@ public class InformationPointUI : MonoBehaviour
             Close();
             throw;
         }
->>>>>>> Stashed changes
     }
 
     public void Close()
     {
-<<<<<<< Updated upstream
-        if (!_isOpen)
-            return;
-
-        _canvas.SetActive(false);
-
-        Cursor.lockState = _previousCursorLockState;
-        Cursor.visible = _previousCursorVisible;
-
-        _isOpen = false;
-        _moveToCenterTimer = 0f;
-    }
-}
-=======
         if (!IsOpen)
             return;
 
@@ -534,4 +388,3 @@ public class InformationPointUI : MonoBehaviour
             Destroy(prompt);
     }
 }
->>>>>>> Stashed changes

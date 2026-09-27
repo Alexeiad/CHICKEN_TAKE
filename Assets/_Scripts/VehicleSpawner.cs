@@ -32,8 +32,12 @@ public class VehicleSpawner : MonoBehaviour
 
     private void Update()
     {
+
         if (InformationPointUI.BlocksGameplayInput)
             return;
+
+
+        if (InformationPointUI.BlocksGameplayInput) return;
 
         if (_vehicleObject == null || _vehiclePlayerObject == null)
             return;

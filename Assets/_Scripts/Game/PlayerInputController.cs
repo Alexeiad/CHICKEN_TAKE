@@ -29,6 +29,12 @@ public class PlayerInputController : ITickable
 
     public void Tick()
     {
+        if (InformationPointUI.BlocksGameplayInput)
+        {
+            _footstepAudio?.StopFootsteps();
+            if (_playerAnimator != null) _playerAnimator.SetBool(_animKeyWalk, false);
+            return;
+        }
         Player player = _playerRegistry.AllEntities
             .OfType<Player>()
             .FirstOrDefault();
