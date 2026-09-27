@@ -32,6 +32,9 @@ public class VehicleSpawner : MonoBehaviour
 
     private void Update()
     {
+        if (InformationPointUI.BlocksGameplayInput)
+            return;
+
         if (_vehicleObject == null || _vehiclePlayerObject == null)
             return;
 
@@ -115,6 +118,8 @@ public class VehicleSpawner : MonoBehaviour
         if (footstepAudio != null)
             footstepAudio.StopFootsteps();
 
+        player.SetVehicleState(Player.VehicleState.InVehicle);
+
         PlayerFootstepAudio.isOnSeat = true;
 
         player.gameObject.SetActive(false);
@@ -122,7 +127,6 @@ public class VehicleSpawner : MonoBehaviour
         _vehiclePlayerObject.SetActive(true);
         SetVehiclePlayerComponentsActive(true);
 
-        // Сразу отключаем UI взаимодействия
         SetInteractionZone(false);
 
         PlayInteractionSound();
@@ -172,9 +176,10 @@ public class VehicleSpawner : MonoBehaviour
         player.transform.position = exitPosition;
         player.gameObject.SetActive(true);
 
+        player.SetVehicleState(Player.VehicleState.NotInVehicle);
+
         PlayerFootstepAudio.isOnSeat = false;
 
-        // После выхода проверяем, находится ли игрок снова в зоне
         UpdateInteractionZone();
     }
 

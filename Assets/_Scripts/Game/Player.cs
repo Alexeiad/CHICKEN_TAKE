@@ -3,15 +3,22 @@ using Zenject;
 
 public class Player : MonoBehaviour, IEntity
 {
-    
+    public enum VehicleState
+    {
+        NotInVehicle,
+        InVehicle
+    }
+
     public IPlayerMovement Movement => _movement;
     public Transform Transform => transform;
+    public VehicleState State => _state;
 
-    private IEntityRegistry<IEntity> _registry; // Изменили с Player на IEntity
+    private IEntityRegistry<IEntity> _registry;
     private IPlayerMovement _movement;
+    private VehicleState _state = VehicleState.NotInVehicle;
 
     [Inject]
-    private void Construct(IEntityRegistry<IEntity> registry) // Изменили тип параметра
+    private void Construct(IEntityRegistry<IEntity> registry)
     {
         _registry = registry;
     }
@@ -29,5 +36,10 @@ public class Player : MonoBehaviour, IEntity
     private void OnDestroy()
     {
         _registry?.Unregister(this);
+    }
+
+    public void SetVehicleState(VehicleState state)
+    {
+        _state = state;
     }
 }

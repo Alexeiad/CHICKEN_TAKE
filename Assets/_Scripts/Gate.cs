@@ -9,7 +9,6 @@ public class Gate : MonoBehaviour
 
     private void Update()
     {
-
         float distance = Vector3.Distance(transform.position, _targetObject.transform.position);
 
         if (distance < _distance)
