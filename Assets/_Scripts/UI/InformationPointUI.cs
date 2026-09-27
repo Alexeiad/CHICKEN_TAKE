@@ -86,13 +86,19 @@ public class InformationPointUI : MonoBehaviour
 
     private void HandleOpenState()
     {
-        if (!Input.GetKeyDown(KeyCode.Escape))
+        if (!Input.GetKeyDown(_interactionKey) &&
+            !Input.GetKeyDown(KeyCode.Escape))
+        {
             return;
+        }
 
         if (view != null)
+        {
             view.Back();
-        else
-            Close();
+            return;
+        }
+
+        Close();
     }
 
     private void UpdatePlayer()
