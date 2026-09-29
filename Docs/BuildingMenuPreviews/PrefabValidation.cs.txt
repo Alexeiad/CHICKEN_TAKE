@@ -1,0 +1,106 @@
+using System;
+using System.Collections;
+using System.Linq;
+using System.IO;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using UnityEngine.UI;
+using Object = UnityEngine.Object;
+public static class PrefabValidation
+{
+    static IEnumerator checks;
+    static double next;
+    static int assertions;
+    static void Assert(bool valid, string message) { if (!valid) throw new Exception(message); assertions++; }
+    public static void Run()
+    {
+        EditorSceneManager.NewScene(NewSceneSetup.EmptyScene);
+        EditorSettings.enterPlayModeOptionsEnabled = true;
+        EditorSettings.enterPlayModeOptions = EnterPlayModeOptions.DisableDomainReload;
+        EditorApplication.playModeStateChanged += state => {
+            if (state == PlayModeStateChange.EnteredPlayMode) { checks = Checks(); EditorApplication.update += Tick; }
+        };
+        EditorApplication.isPlaying = true;
+    }
+    static void Tick()
+    {
+        if (EditorApplication.timeSinceStartup < next) return;
+        next = EditorApplication.timeSinceStartup + .3;
+        try { if (!checks.MoveNext()) { File.WriteAllText("validation.txt", "PASS " + assertions + " prefab runtime assertions"); EditorApplication.Exit(0); } }
+        catch(Exception ex) { Debug.LogException(ex); File.WriteAllText("validation.txt","FAIL "+ex); EditorApplication.Exit(1); }
+    }
+    static void Capture(BuildingMenuView view, string name)
+    {
+        var camera = new GameObject("Capture camera").AddComponent<Camera>();
+        var texture = new RenderTexture(1600,900,24);
+        camera.targetTexture = texture;
+        var canvas = view.GetComponent<Canvas>();
+        canvas.renderMode=RenderMode.ScreenSpaceCamera; canvas.worldCamera=camera; canvas.planeDistance=1;
+        Canvas.ForceUpdateCanvases(); camera.Render();
+        var previous=RenderTexture.active; RenderTexture.active=texture;
+        var image=new Texture2D(1600,900,TextureFormat.RGB24,false);
+        image.ReadPixels(new Rect(0,0,1600,900),0,0); image.Apply();
+        File.WriteAllBytes(name+".png",image.EncodeToPNG());
+        RenderTexture.active=previous; canvas.renderMode=RenderMode.ScreenSpaceOverlay; canvas.worldCamera=null;
+        camera.targetTexture=null; texture.Release(); Object.Destroy(texture); Object.Destroy(image); Object.Destroy(camera.gameObject);
+    }
+    static IEnumerator Checks()
+    {
+        var config = AssetDatabase.LoadAssetAtPath<BuildingMenuConfig>("Assets/_Data/BuildingMenus/BuildingMenus.asset");
+        var background = FMODUnity.RuntimeManager.CreateInstance(config.backgroundMusicEvent);
+        background.start();
+        yield return null;
+        foreach(MenuLanguage lang in Enum.GetValues(typeof(MenuLanguage)))
+        foreach(BuildingKind kind in Enum.GetValues(typeof(BuildingKind)))
+        {
+            PlayerPrefs.SetString("Menu.Language",lang.ToString());
+            var point = new GameObject("Point").AddComponent<InformationPointUI>();
+            var serialized = new SerializedObject(point);
+            serialized.FindProperty("_buildingMenus").objectReferenceValue = config;
+            serialized.FindProperty("_building").enumValueIndex = (int)kind;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            Assert(serialized.FindProperty("_interactionKey").intValue == (int)KeyCode.F,"Default F");
+            Time.timeScale = .75f;
+            point.Open();
+            yield return null;
+            Assert(point.IsOpen && InformationPointUI.BlocksGameplayInput && Time.timeScale == 0,"Modal open");
+            var view = Object.FindObjectOfType<BuildingMenuView>();
+            Assert(view != null,"Prefab instantiated");
+            var prefab = kind == BuildingKind.Barn ? config.barnMenu : kind == BuildingKind.Hangar ? config.hangarMenu : config.shopMenu;
+            Assert(view.GetComponentsInChildren<BuildingMenuBinding>(true).Length == prefab.GetComponentsInChildren<BuildingMenuBinding>(true).Length,"Layout preserved");
+            foreach(var binding in view.GetComponentsInChildren<BuildingMenuBinding>(true))
+                if(binding.value == BuildingMenuBinding.Value.Translation) Assert(binding.label.text == binding.translation.Get(lang),"Translation");
+            foreach(var source in prefab.GetComponentsInChildren<BuildingMenuButton>(true))
+                Assert(source.menu == prefab, "Serialized owner");
+            if(lang == MenuLanguage.Russian) Capture(view,kind.ToString());
+            Assert(view.GetComponentsInChildren<BuildingMenuButton>(true).All(x=>x.menu==view),"Button ownership remapped");
+            if(kind!=BuildingKind.Barn)
+            {
+                view.GetComponentsInChildren<BuildingMenuButton>().First(x=>x.command==BuildingMenuButton.Command.Tab && x.tab==1).GetComponent<Button>().onClick.Invoke();
+                Assert(view.transform.Find("Design canvas/Page/"+(kind==BuildingKind.Hangar?"ModdingPanel":"ItemsPanel")).gameObject.activeInHierarchy,"Tab callback");
+                view.Back();
+            }
+            if(kind==BuildingKind.Shop)
+            {
+                view.GetComponentsInChildren<BuildingMenuButton>().First(x=>x.command==BuildingMenuButton.Command.Story).GetComponent<Button>().onClick.Invoke();
+                yield return null;
+                Assert(view.StoryOpen,"Story callback"); if(lang == MenuLanguage.Russian) Capture(view,"Story");
+                Assert(view.transform.Find("Design canvas/Page/AlienStoryPanel").gameObject.activeInHierarchy,"Story panel");
+                background.getPaused(out bool paused);
+                Assert(paused,"Music paused");
+                view.GetComponentsInChildren<BuildingMenuButton>().Last(x=>x.command==BuildingMenuButton.Command.Back).GetComponent<Button>().onClick.Invoke();
+                yield return null;
+                Assert(!view.StoryOpen,"Story back");
+                background.getPaused(out paused); Assert(!paused,"Music resumed");
+            }
+            view.GetComponentsInChildren<BuildingMenuButton>().First(x=>x.command==BuildingMenuButton.Command.Close).GetComponent<Button>().onClick.Invoke();
+            Assert(!point.IsOpen && Time.timeScale==.75f,"Close callback restores time");
+            yield return null;
+            Assert(!InformationPointUI.BlocksGameplayInput,"Input released");
+            Object.Destroy(point.gameObject);
+            yield return null;
+        }
+        background.stop(FMOD.Studio.STOP_MODE.IMMEDIATE); background.release();
+    }
+}

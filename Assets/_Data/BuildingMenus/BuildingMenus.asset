@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d9755fd451a42ca826fd02123c3ee10, type: 3}
   m_Name: BuildingMenus
   m_EditorClassIdentifier: 
-  font: {fileID: 11400000, guid: ac43cf3bb8cf74b48a1e89511552a813, type: 2}
+  font: {fileID: 11400000, guid: 45e0584e9524d674cacab4663cb5ab18, type: 2}
   playerData: {fileID: 11400000, guid: 58e8306aa9e94914a9e6e1ecc66b5d3e, type: 2}
   barnMenu: {fileID: 8262287699535715182, guid: 09309430b9c269945ab6317ab4abb969, type: 3}
   hangarMenu: {fileID: 2104301769987655092, guid: 42390ef3f1dd5e94fa3e23c5ea4018dc, type: 3}
