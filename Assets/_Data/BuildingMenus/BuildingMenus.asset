@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   font: {fileID: 11400000, guid: 45e0584e9524d674cacab4663cb5ab18, type: 2}
   playerData: {fileID: 11400000, guid: 58e8306aa9e94914a9e6e1ecc66b5d3e, type: 2}
-  barnMenu: {fileID: 8262287699535715182, guid: 09309430b9c269945ab6317ab4abb969, type: 3}
-  hangarMenu: {fileID: 2104301769987655092, guid: 42390ef3f1dd5e94fa3e23c5ea4018dc, type: 3}
-  shopMenu: {fileID: 4418541433324790240, guid: 6953c0ba87d888f4bb0ae19ffc9d9105, type: 3}
+  barnMenu: {fileID: 8262287699535715182, guid: c2bc7cb893d2ccc45ba87211049398b2, type: 3}
+  hangarMenu: {fileID: 2104301769987655092, guid: 26df242bd8dd0f44ebf66eafe23b7244, type: 3}
+  shopMenu: {fileID: 4418541433324790240, guid: d6db04e30a47af948847676619c57886, type: 3}
   barnBackground: {fileID: 2800000, guid: 9383ad77ae4704d4a9f4a6470cccb977, type: 3}
   hangarBackground: {fileID: 2800000, guid: 7d9755fd451a42ca826fd02123c3ee15, type: 3}
   shopBackground: {fileID: 2800000, guid: 7d9755fd451a42ca826fd02123c3ee14, type: 3}
