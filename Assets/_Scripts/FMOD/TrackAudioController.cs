@@ -3,7 +3,7 @@ using FMODUnity;
 using UnityEngine;
 using STOP_MODE = FMOD.Studio.STOP_MODE;
 
-[RequireComponent(typeof(Rigidbody))]
+
 public class TrackAudio : MonoBehaviour
 {
     [Header("FMOD Track Event")]

@@ -539,6 +539,7 @@ MonoBehaviour:
     m_Bits: 4294967295
   _sellPoint: {fileID: 0}
   _sellDistance: 25
+  _maxCollectedCount: 15
   _data: {fileID: 11400000, guid: 58e8306aa9e94914a9e6e1ecc66b5d3e, type: 2}
   _zoneEvent: {fileID: 11400000, guid: 305b53f79fb895c4ca08dd796a411b84, type: 2}
 --- !u!1 &1449680889177582259
@@ -1620,6 +1621,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 112cd5cf1189db24d8cd05cf8afde5c0, type: 2}
+  - {fileID: 2100000, guid: 0e9d4cd428a956446bc792fb536251ca, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
