@@ -15,7 +15,9 @@ public class PlayerInputController : ITickable
     private PlayerFootstepAudio _footstepAudio;
 
     private const string _animKeyWalk = "isWalk";
+    private const string _animKeyRun = "isRun";
     private const float _rotationSpeed = 10f;
+    private float _runMultiplier = 2f;
 
     public PlayerInputController(
         IEntityRegistry<IEntity> playerRegistry,
@@ -27,14 +29,23 @@ public class PlayerInputController : ITickable
         OnAudioReady += audio => _footstepAudio = audio;
     }
 
+
+
+    
+
     public void Tick()
     {
         if (InformationPointUI.BlocksGameplayInput)
         {
             _footstepAudio?.StopFootsteps();
-            if (_playerAnimator != null) _playerAnimator.SetBool(_animKeyWalk, false);
+            if (_playerAnimator != null)
+            {
+                _playerAnimator.SetBool(_animKeyWalk, false);
+                _playerAnimator.SetBool(_animKeyRun, false);
+            }
             return;
         }
+
         Player player = _playerRegistry.AllEntities
             .OfType<Player>()
             .FirstOrDefault();
@@ -50,8 +61,10 @@ public class PlayerInputController : ITickable
             _cameraController.Right * horizontal;
 
         bool isMoving = moveDirection.sqrMagnitude > 0.001f;
+        bool isRunning = isMoving && Input.GetKey(KeyCode.LeftShift);
 
         _playerAnimator.SetBool(_animKeyWalk, isMoving);
+        _playerAnimator.SetBool(_animKeyRun, isRunning);
 
         if (isMoving)
             _footstepAudio?.StartFootsteps();
@@ -78,6 +91,9 @@ public class PlayerInputController : ITickable
                 );
             }
         }
+
+        if (isRunning)
+            moveDirection *= _runMultiplier;
 
         player.Movement.Move(moveDirection);
     }
