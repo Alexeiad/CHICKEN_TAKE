@@ -32,7 +32,9 @@ Shader "Custom/TutorialHighlight"
         [Header(Math Effects)]
         _Arms ("Spiral: Arms", Range(1, 10)) = 3
         _FractalIter ("Fractal: Iterations", Range(8, 64)) = 32
-        _FractalZoom ("Fractal: Zoom", Range(0.5, 6)) = 2.5
+        [Enum(Julia,0,Burning Ship,1,Mandelbrot,2,Cubic Julia,3)] _FractalType ("Fractal: Type", Float) = 0
+        _FractalTiles ("Fractal: Tiles (повторов узора на грань)", Range(0, 8)) = 2
+        _FractalView ("Fractal: View Size (меньше = крупнее детали)", Range(0.3, 3)) = 1.5
         _CellScale ("Cells: Scale", Range(1, 10)) = 4
 
         [Header(Pixel Blink)]
@@ -98,7 +100,7 @@ Shader "Custom/TutorialHighlight"
 
             float4 _WaveDir;
             float _Speed;
-            float _Arms, _FractalIter, _FractalZoom, _CellScale;
+            float _Arms, _FractalIter, _FractalType, _FractalTiles, _FractalView, _CellScale;
             float _PixelMix, _PixelScale, _PixelDensity, _BlinkRate, _PixelNear, _PixelFar;
 
             float4 _GlowColor, _GlowColor2;
@@ -145,22 +147,37 @@ Shader "Custom/TutorialHighlight"
                 return c.z * lerp(K.xxx, saturate(p - K.xxx), c.y);
             }
 
-            // Множество Жюлиа. Возвращает -1 внутри множества, иначе сглаженное число итераций.
-            float julia(float2 z, float2 c)
+            // Фракталы: 0 Julia, 1 Burning Ship, 2 Mandelbrot, 3 Cubic Julia.
+            // Возвращает -1 внутри множества, иначе сглаженное число итераций.
+            // trap = расстояние орбиты до "ловушки" (крест + круг) - даёт тонкие узоры-нити по всей поверхности.
+            float fractalCalc(float2 p, float2 c, out float trap)
             {
+                int type = (int)(_FractalType + 0.5);
+                float2 z = p;
+                float2 cc = c;
+                if (type == 2) { cc = p + float2(-0.5, 0.0); z = float2(0.0, 0.0); }
+
                 float it = 0.0;
                 float r2 = dot(z, z);
+                trap = 10.0;
                 int maxIt = (int)_FractalIter;
                 [loop]
                 for (int k = 0; k < 64; k++)
                 {
                     if (k >= maxIt || r2 > 256.0) break;
-                    z = float2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y) + c;
+                    if (type == 1) z = abs(z);
+                    if (type == 3)
+                        z = float2(z.x * z.x * z.x - 3.0 * z.x * z.y * z.y,
+                                   3.0 * z.x * z.x * z.y - z.y * z.y * z.y) + cc;
+                    else
+                        z = float2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y) + cc;
                     r2 = dot(z, z);
+                    trap = min(trap, min(min(abs(z.x), abs(z.y)), abs(sqrt(r2) - 0.8)));
                     it += 1.0;
                 }
                 if (it >= (float)maxIt) return -1.0;
-                return it + 1.0 - log2(0.5 * log(max(r2, 1.0001)));
+                float lg = (type == 3) ? 3.0 : 2.0;
+                return it + 1.0 - log(max(0.5 * log(max(r2, 1.0001)), 1e-4)) / log(lg);
             }
 
             v2f vert(appdata v)
@@ -290,12 +307,13 @@ Shader "Custom/TutorialHighlight"
                 #elif defined(_MODE_FRACTAL)
                     // Анимированное множество Жюлиа. Три проекции (YZ, XZ, XY) смешиваются по нормали,
                     // поэтому фрактал плавно переходит с грани на грань.
+                    // Узор зеркально "замощает" каждую грань (Tiles) и медленно плывёт по ней,
+                    // поэтому вся поверхность заполнена, без пустых зон. Каждая из 6 граней
+                    // получает свою фазу, то есть свой узор.
                     float3 O = i.objPos;
                     float3 wt = pow(abs(i.objNormal), 6.0);
                     wt /= (wt.x + wt.y + wt.z + 1e-5);
-                    float ca = t * 0.3;
-                    float2 jc = 0.7885 * float2(cos(ca), sin(ca));
-                    float zoom = _FractalZoom * (1.0 + 0.15 * sin(t * 0.5));
+                    float view = _FractalView * (1.0 + 0.12 * sin(t * 0.5));
                     float3 fcol = 0;
                     [unroll]
                     for (int k = 0; k < 3; k++)
@@ -303,24 +321,32 @@ Shader "Custom/TutorialHighlight"
                         float wgt = (k == 0) ? wt.x : ((k == 1) ? wt.y : wt.z);
                         if (wgt >= 0.02)
                         {
-                            float2 p = (k == 0) ? O.yz : ((k == 1) ? O.xz : O.xy);
-                            float v = julia(p * zoom, jc);
-                            float3 fc;
-                            if (v < 0.0)
-                            {
-                                fc = _GlowColor2.rgb * 0.5;
-                            }
-                            else
-                            {
-                                float3 pl = 0.5 + 0.5 * sin(v * 0.4 + t * 1.5 + float3(0, 2, 4));
-                                float bright = saturate(v / (_FractalIter * 0.35));
-                                fc = lerp(_GlowColor.rgb, _GlowColor2.rgb, pl.x) * (0.15 + 0.85 * bright) * (0.6 + 0.4 * pl.y);
-                            }
+                            float2 raw = (k == 0) ? O.yz : ((k == 1) ? O.xz : O.xy);
+                            float sgn = (k == 0) ? i.objNormal.x : ((k == 1) ? i.objNormal.y : i.objNormal.z);
+                            float phase = (float)k * 2.1 + ((sgn < 0.0) ? 1.3 : 0.0);
+
+                            // зеркальный повтор (треугольная волна) = без швов между тайлами
+                            float2 xw = (raw + 0.5) * 2.0 * _FractalTiles + float2(0.31, 0.57) * phase + t * 0.08;
+                            float2 tp = abs(frac(xw * 0.5) * 2.0 - 1.0);
+                            float2 p = (tp * 2.0 - 1.0) * view;
+
+                            float ca = t * 0.3 + phase;
+                            float2 jc = 0.7885 * float2(cos(ca), sin(ca));
+
+                            float trap;
+                            float v = fractalCalc(p, jc, trap);
+
+                            float key = (v < 0.0) ? trap * 6.0 : v * 0.35;
+                            float3 pl = 0.5 + 0.5 * sin(key + t * 1.5 + float3(0, 2, 4));
+                            float3 fc = lerp(_GlowColor.rgb, _GlowColor2.rgb, pl.x) * (0.45 + 0.55 * pl.y);
+                            float trapLine = exp(-trap * 10.0);
+                            fc += lerp(_GlowColor.rgb, _GlowColor2.rgb, 0.5) * trapLine * 1.5;
+                            if (v < 0.0) fc *= 0.85;
                             fcol += fc * wgt;
                         }
                     }
-                    glow = fcol * 2.0
-                         + _GlowColor.rgb * rim * _RimStrength * 0.5
+                    glow = fcol * 1.6
+                         + _GlowColor.rgb * rim * _RimStrength * 0.4
                          + _GlowColor2.rgb * edge * _EdgeStrength * 0.7;
 
                 #elif defined(_MODE_PLASMA)
