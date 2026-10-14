@@ -542,6 +542,21 @@ MonoBehaviour:
   _maxCollectedCount: 15
   _data: {fileID: 11400000, guid: 58e8306aa9e94914a9e6e1ecc66b5d3e, type: 2}
   _zoneEvent: {fileID: 11400000, guid: 305b53f79fb895c4ca08dd796a411b84, type: 2}
+  _collectEvent:
+    Guid:
+      Data1: -510381380
+      Data2: 1267146667
+      Data3: -1425217631
+      Data4: -749128417
+    Path: event:/boom
+  _sellEvent:
+    Guid:
+      Data1: 1432981569
+      Data2: 1188106040
+      Data3: -1343154293
+      Data4: -256386051
+    Path: event:/sell
+  _pitchRange: {x: 0.8, y: 1.3}
 --- !u!1 &1449680889177582259
 GameObject:
   m_ObjectHideFlags: 0

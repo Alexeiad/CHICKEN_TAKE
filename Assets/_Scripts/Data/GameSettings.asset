@@ -21,6 +21,11 @@ MonoBehaviour:
     Mode: 1
     MaxDistance: 5
     MinDistance: 0.01
+    Vehicle:
+      Distance: 8
+      TargetOffset: {x: 0, y: 4.69, z: 0}
+      VerticalLimits: {x: -20, y: 60}
+      TransitionSpeed: 5
   Player:
     Speed: 5
     Gravity: -9.81

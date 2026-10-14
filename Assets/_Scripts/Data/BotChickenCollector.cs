@@ -1,4 +1,5 @@
 using System;
+using FMODUnity;
 using UnityEngine;
 using Zenject;
 
@@ -15,6 +16,11 @@ public class BotChickenCollector : MonoBehaviour
 
     [Header("Chicken")]
     [SerializeField] private int _maxCollectedCount = 15;
+
+    [Header("Audio")]
+    [SerializeField] private EventReference _collectEvent;
+    [SerializeField] private EventReference _sellEvent;
+    [SerializeField] private Vector2 _pitchRange = new Vector2(0.9f, 1.1f);
 
     private int _collectedCount;
 
@@ -93,6 +99,8 @@ public class BotChickenCollector : MonoBehaviour
 
         OnChickenCountChanged?.Invoke();
 
+        PlaySound(_collectEvent);
+
         Destroy(chicken.gameObject);
     }
 
@@ -132,6 +140,8 @@ public class BotChickenCollector : MonoBehaviour
             coinsEarned,
             chickensSold
         );
+
+        PlaySound(_sellEvent);
     }
 
     public void RemoveChickens(int amount)
@@ -153,5 +163,17 @@ public class BotChickenCollector : MonoBehaviour
         _data.Chicken = _collectedCount;
 
         OnChickenCountChanged?.Invoke();
+    }
+
+    private void PlaySound(EventReference eventReference)
+    {
+        if (eventReference.IsNull)
+            return;
+
+        var instance = RuntimeManager.CreateInstance(eventReference);
+        instance.set3DAttributes(RuntimeUtils.To3DAttributes(transform.position));
+        instance.setPitch(UnityEngine.Random.Range(_pitchRange.x, _pitchRange.y));
+        instance.start();
+        instance.release();
     }
 }

@@ -15,10 +15,10 @@ MonoBehaviour:
   Path: Assets/FMOD/kuromusic/Build/Desktop/Master.strings.bank
   Name: Master.strings
   StudioPath: bank:/Master.strings
-  lastModified: 639236334099320105
+  lastModified: 639276161802373325
   FileSizes:
   - Name: Desktop
-    Value: 1360
+    Value: 1442
   Exists: 1
 --- !u!114 &-8107001979972505843
 MonoBehaviour:
@@ -30,9 +30,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
-  m_Name: event:/Step
+  m_Name: event:/step
   m_EditorClassIdentifier: 
-  Path: event:/Step
+  Path: event:/step
   Guid:
     Data1: -896489882
     Data2: 1298405525
@@ -209,6 +209,33 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 103200
+--- !u!114 &-2480000838383678676
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/boom
+  m_EditorClassIdentifier: 
+  Path: event:/boom
+  Guid:
+    Data1: -510381380
+    Data2: 1267146667
+    Data3: -1425217631
+    Data4: -749128417
+  Banks:
+  - {fileID: 4018759128057695180}
+  IsStream: 1
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 586
 --- !u!114 &-437247814186941907
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -266,12 +293,14 @@ MonoBehaviour:
   - {fileID: -8107001979972505843}
   - {fileID: -4369773115572565359}
   - {fileID: 277340989967251150}
+  - {fileID: 4736620626664628244}
+  - {fileID: -2480000838383678676}
   EditorParameters: []
   MasterBanks:
   - {fileID: 4018759128057695180}
   StringsBanks:
   - {fileID: -8390241294454344871}
-  cacheTime: 639236334099320105
+  cacheTime: 639276161802373325
   cacheVersion: 131637
 --- !u!114 &277340989967251150
 MonoBehaviour:
@@ -369,11 +398,38 @@ MonoBehaviour:
   Path: Assets/FMOD/kuromusic/Build/Desktop/Master.bank
   Name: Master
   StudioPath: bank:/Master
-  lastModified: 639236334099290117
+  lastModified: 639276161802343263
   FileSizes:
   - Name: Desktop
-    Value: 15622784
+    Value: 15638560
   Exists: 1
+--- !u!114 &4736620626664628244
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/sell
+  m_EditorClassIdentifier: 
+  Path: event:/sell
+  Guid:
+    Data1: 1432981569
+    Data2: 1188106040
+    Data3: -1343154293
+    Data4: -256386051
+  Banks:
+  - {fileID: 4018759128057695180}
+  IsStream: 1
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 788
 --- !u!114 &5215211852044353450
 MonoBehaviour:
   m_ObjectHideFlags: 0

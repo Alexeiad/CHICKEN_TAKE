@@ -12,6 +12,8 @@ public class GameSettingsSO : ScriptableObject
 [Serializable]
 public class CameraSettings
 {
+
+    // --- Пешком ---
     public float Sensitivity = 2f;
     public float Distance = 3f;
     public Vector3 TargetOffset = new Vector3(0, 1.5f, 0);
@@ -20,8 +22,18 @@ public class CameraSettings
     public CameraMode Mode = CameraMode.ThirdPerson;
     public float MaxDistance = 10f;
     public float MinDistance = 0.01f;
-}
 
+    // --- В транспорте (отдельный блок) ---
+    public VehicleCameraSettings Vehicle = new();
+}
+[Serializable]
+public class VehicleCameraSettings
+{
+    public float Distance = 6f;
+    public Vector3 TargetOffset = new Vector3(0f, 1f, 0f);
+    public Vector2 VerticalLimits = new Vector2(-20f, 60f);
+    public float TransitionSpeed = 5f; // чем больше, тем быстрее переход
+}
 [Serializable]
 public class PlayerSettings
 {
