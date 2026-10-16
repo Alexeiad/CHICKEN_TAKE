@@ -15,7 +15,7 @@ MonoBehaviour:
   Path: Assets/FMOD/kuromusic/Build/Desktop/Master.strings.bank
   Name: Master.strings
   StudioPath: bank:/Master.strings
-  lastModified: 639277533521582342
+  lastModified: 639276161802373325
   FileSizes:
   - Name: Desktop
     Value: 1442
@@ -300,7 +300,7 @@ MonoBehaviour:
   - {fileID: 4018759128057695180}
   StringsBanks:
   - {fileID: -8390241294454344871}
-  cacheTime: 639277533521582342
+  cacheTime: 639276161802373325
   cacheVersion: 131637
 --- !u!114 &277340989967251150
 MonoBehaviour:
@@ -398,7 +398,7 @@ MonoBehaviour:
   Path: Assets/FMOD/kuromusic/Build/Desktop/Master.bank
   Name: Master
   StudioPath: bank:/Master
-  lastModified: 639277533521582342
+  lastModified: 639276161802343263
   FileSizes:
   - Name: Desktop
     Value: 15638560

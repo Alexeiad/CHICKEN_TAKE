@@ -77,9 +77,9 @@ Material:
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
-    - _EdgeStrength: 0.84
-    - _EdgeWidth: 0.218
-    - _FractalIter: 49.2
+    - _EdgeStrength: 0
+    - _EdgeWidth: 0.01
+    - _FractalIter: 50.8
     - _FractalTiles: 2
     - _FractalType: 0
     - _FractalView: 1.5
@@ -87,13 +87,13 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _Intensity: 0.406
+    - _Intensity: 1
     - _MaskInvert: 0
     - _MaskPower: 0.2
     - _MaskStrength: 0
     - _Metallic: 0
     - _Mode: 3
-    - _NoiseScale: 10.8
+    - _NoiseScale: 5
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _PixelBlink: 0
@@ -103,8 +103,8 @@ Material:
     - _PixelNear: 2
     - _PixelScale: 24
     - _RimPower: 8
-    - _RimStrength: 1.29
-    - _ScanLines: 55
+    - _RimStrength: 4
+    - _ScanLines: 200
     - _SmoothNormals: 0
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
@@ -118,7 +118,7 @@ Material:
     - _BoxSize: {r: 0.5, g: 0.5, b: 0.5, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _GlowColor: {r: 1, g: 1, b: 1, a: 1}
+    - _GlowColor: {r: 0.09433961, g: 0, b: 0.06831487, a: 1}
     - _GlowColor2: {r: 0, g: 0.21568628, b: 0.19726336, a: 1}
     - _WaveDir: {r: 0, g: 1, b: 0, a: 1}
   m_BuildTextureStacks: []
