@@ -34,11 +34,35 @@ public class VehicleCameraSettings
     public Vector2 VerticalLimits = new Vector2(-20f, 60f);
     public float TransitionSpeed = 5f; // чем больше, тем быстрее переход
 }
+
 [Serializable]
 public class PlayerSettings
 {
     public float Speed = 10f;
     public float Gravity = -9.81f;
+    [Min(0f)] public float JumpHeight = 1.5f;
+
+    [Header("Jump Timing")]
+    [Tooltip("Задержка между нажатием пробела и отрывом от земли (время на приседание в анимации), сек")]
+    [Min(0f)] public float JumpDelay = 0.25f;
+
+    [Tooltip("Стоять на месте, пока идёт приседание перед прыжком")]
+    public bool LockMoveWhileCrouch = true;
+
+    [Tooltip("Сколько секунд после касания земли держится анимация прыжка (амортизация при приземлении)")]
+    [Min(0f)] public float LandingDelay = 0.2f;
+
+    [Tooltip("Стоять на месте, пока идёт амортизация после приземления")]
+    public bool LockMoveWhileLanding = true;
+
+    [Header("Animator")]
+    public string AnimKeyIdle = "isIdle";
+    public string AnimKeyWalk = "isWalk";
+    public string AnimKeyRun = "isRun";
+    public string AnimKeyJump = "isJump";
+
+    [Tooltip("Имя состояния прыжка в Animator. Пока оно играется, ходьба и бег ждут. Если пусто, ждём только приземления и LandingDelay")]
+    public string JumpStateName = "Jump";
 }
 [System.Serializable]
 public struct SpeedProfileSettings

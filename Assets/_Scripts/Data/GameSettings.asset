@@ -29,6 +29,15 @@ MonoBehaviour:
   Player:
     Speed: 5
     Gravity: -9.81
+    JumpHeight: 1
+    JumpDelay: 0.7
+    LockMoveWhileCrouch: 1
+    LandingDelay: 0.3
+    LockMoveWhileLanding: 1
+    AnimKeyWalk: isWalk
+    AnimKeyRun: isRun
+    AnimKeyJump: isJump
+    JumpStateName: Jump
   Chicken:
     TurnSpeed: 8
     Gravity: -9.81

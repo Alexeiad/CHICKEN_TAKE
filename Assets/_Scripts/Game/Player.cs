@@ -10,12 +10,14 @@ public class Player : MonoBehaviour, IEntity
     }
 
     public IPlayerMovement Movement => _movement;
-    public Transform Transform => transform;
-    public VehicleState State => _state;
-
     private IEntityRegistry<IEntity> _registry;
     private IPlayerMovement _movement;
+    
+    public VehicleState State => _state;
     private VehicleState _state = VehicleState.NotInVehicle;
+
+
+    public Transform Transform => transform;
 
     [Inject]
     private void Construct(IEntityRegistry<IEntity> registry)
