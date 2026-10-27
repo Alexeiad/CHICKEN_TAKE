@@ -86,6 +86,17 @@ public class TutorialHintManager : MonoBehaviour
             if (_player == null) return;
         }
 
+        // Если игрок выключен (сидит в транспорте) — прячем подсказку и выходим
+        if (!_player.gameObject.activeInHierarchy)
+        {
+            if (_current != null)
+            {
+                SetVisible(false);
+                _current = null;
+            }
+            return;
+        }
+
         float dt = Time.deltaTime;
         if (dt <= 0f) return;
 
@@ -95,9 +106,17 @@ public class TutorialHintManager : MonoBehaviour
         for (int i = Boxes.Count - 1; i >= 0; i--)
         {
             var box = Boxes[i];
-            if (box == null) { Boxes.RemoveAt(i); continue; }
+            if (box == null)
+            {
+                Boxes.RemoveAt(i);
+                continue;
+            }
 
-            if (!_states.TryGetValue(box, out var st)) { st = new BoxState(); _states[box] = st; }
+            if (!_states.TryGetValue(box, out var st))
+            {
+                st = new BoxState();
+                _states[box] = st;
+            }
 
             float dist = Vector3.Distance(_player.transform.position, box.transform.position);
 
@@ -108,22 +127,28 @@ public class TutorialHintManager : MonoBehaviour
                 continue;
             }
 
-            // Скорость сближения: >0 — игрок идёт к ящику.
             float closing = st.init ? (st.prevDist - dist) / dt : 0f;
             st.prevDist = dist;
             st.init = true;
 
-            if (closing >= _minApproachSpeed) st.timer += dt;
-            else st.timer = 0f;
+            if (closing >= _minApproachSpeed)
+                st.timer += dt;
+            else
+                st.timer = 0f;
 
-            // Уже показанную подсказку не прячем, пока игрок в радиусе.
             bool eligible = box == _current || st.timer >= _approachTime;
-            if (eligible && dist < bestDist) { best = box; bestDist = dist; }
+
+            if (eligible && dist < bestDist)
+            {
+                best = box;
+                bestDist = dist;
+            }
         }
 
         if (best != _current)
         {
             _current = best;
+
             if (_current != null && _textByType.TryGetValue(_current.HintType, out var txt))
             {
                 _hintText.text = txt;

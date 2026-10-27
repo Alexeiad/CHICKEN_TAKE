@@ -35,25 +35,41 @@ public class SceneInstaller : MonoInstaller
 
     private void BindInfrastructure()
     {
-        Container.Bind(typeof(IEntityRegistry<IEntity>)).To(typeof(EntityRegistry<IEntity>)).AsSingle();
+        Container.Bind(typeof(IEntityRegistry<IEntity>))
+            .To(typeof(EntityRegistry<IEntity>))
+            .AsSingle();
     }
     private void BindEntities()
     {
-        Container.Bind<Animator>().FromInstance(_playerAnimator).AsSingle();
+        // Аниматор нужен для PlayerInputController
+        Container.Bind<Animator>()
+            .FromInstance(_playerAnimator)
+            .AsSingle();
 
-        Container.Bind<Player>().FromComponentInNewPrefab(_playerPrefab).AsSingle();
+        // Игрок уже лежит на сцене
+        Container.Bind<Player>()
+            .FromComponentInHierarchy()
+            .AsSingle();
+
         Container.Bind<IEntity>().To<Player>().FromResolve();
 
-        // Добавляем привязку для машины на сцене:
-        Container.Bind<Vechicle>().FromComponentInHierarchy().AsSingle();
+        // Машина с сцены
+        Container.Bind<Vechicle>()
+            .FromComponentInHierarchy()
+            .AsSingle();
+
         Container.Bind<IEntity>().To<Vechicle>().FromResolve();
 
-        Container.Bind<CameraController>().FromInstance(_cameraController).AsSingle();
+        Container.Bind<CameraController>()
+            .FromInstance(_cameraController)
+            .AsSingle();
 
-        if(_chickenPrefab != null) 
-        Container.BindFactory<Chicken, Chicken.Factory>()
-            .FromComponentInNewPrefab(_chickenPrefab)
-            .AsTransient();
+        if (_chickenPrefab != null)
+        {
+            Container.BindFactory<Chicken, Chicken.Factory>()
+                .FromComponentInNewPrefab(_chickenPrefab)
+                .AsTransient();
+        }
     }
     private void BindControllers()
     {

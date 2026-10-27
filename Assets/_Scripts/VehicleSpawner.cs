@@ -21,7 +21,6 @@ public class VehicleSpawner : MonoBehaviour
     [SerializeField] private EventReference _interactionEvent;
 
     private IEntityRegistry<IEntity> _entityRegistry;
-
     private bool _wasInZone;
 
     [Inject]
@@ -30,27 +29,72 @@ public class VehicleSpawner : MonoBehaviour
         _entityRegistry = entityRegistry;
     }
 
+    private void Start()
+    {
+        // При загрузке сцены всегда сбрасываем состояние в "не в транспорте"
+        ResetToNotInVehicle();
+    }
+
+    private void ResetToNotInVehicle()
+    {
+        PlayerFootstepAudio.isOnSeat = false;
+
+        Player player = GetPlayer();
+        if (player != null)
+        {
+            player.SetVehicleState(Player.VehicleState.NotInVehicle);
+            player.gameObject.SetActive(true);
+        }
+
+        if (_vehiclePlayerObject != null)
+        {
+            _vehiclePlayerObject.SetActive(false);
+            SetVehiclePlayerComponentsActive(false);
+        }
+    }
+
     private void Update()
     {
-
         if (InformationPointUI.BlocksGameplayInput)
             return;
-
-
-        if (InformationPointUI.BlocksGameplayInput) return;
 
         if (_vehicleObject == null || _vehiclePlayerObject == null)
             return;
 
-        if (_vehiclePlayerObject.activeInHierarchy)
+        bool isInVehicle = PlayerFootstepAudio.isOnSeat;
+
+        if (isInVehicle)
         {
+            if (!_vehiclePlayerObject.activeInHierarchy)
+            {
+                Player player = GetPlayer();
+                if (player != null)
+                    player.gameObject.SetActive(false);
+
+                _vehiclePlayerObject.SetActive(true);
+                SetVehiclePlayerComponentsActive(true);
+            }
+
             TryExitVehicle();
             return;
+        }
+
+        // Игрок не в транспорте
+        if (_vehiclePlayerObject.activeInHierarchy)
+        {
+            SetVehiclePlayerComponentsActive(false);
+            _vehiclePlayerObject.SetActive(false);
+
+            Player player = GetPlayer();
+            if (player != null)
+                player.gameObject.SetActive(true);
         }
 
         UpdateInteractionZone();
         TryEnterVehicle();
     }
+
+    // ========== Остальные методы без изменений ==========
 
     private void UpdateInteractionZone()
     {
@@ -58,7 +102,6 @@ public class VehicleSpawner : MonoBehaviour
             return;
 
         Player player = GetActivePlayer();
-
         if (player == null)
         {
             SetInteractionZone(false);
@@ -78,14 +121,12 @@ public class VehicleSpawner : MonoBehaviour
             return;
 
         _wasInZone = isInZone;
-
         _interactionZone.SetZoneState(isInZone);
     }
 
     private void TryEnterVehicle()
     {
         Player player = GetActivePlayer();
-
         if (player == null)
             return;
 
@@ -116,23 +157,18 @@ public class VehicleSpawner : MonoBehaviour
             _vehicleObject.SetActive(true);
         }
 
-        PlayerFootstepAudio footstepAudio =
-            player.GetComponent<PlayerFootstepAudio>();
-
+        PlayerFootstepAudio footstepAudio = player.GetComponent<PlayerFootstepAudio>();
         if (footstepAudio != null)
             footstepAudio.StopFootsteps();
 
         player.SetVehicleState(Player.VehicleState.InVehicle);
-
         PlayerFootstepAudio.isOnSeat = true;
 
         player.gameObject.SetActive(false);
-
         _vehiclePlayerObject.SetActive(true);
         SetVehiclePlayerComponentsActive(true);
 
         SetInteractionZone(false);
-
         PlayInteractionSound();
     }
 
@@ -157,7 +193,6 @@ public class VehicleSpawner : MonoBehaviour
     private void ExitVehicle()
     {
         Player player = GetPlayer();
-
         if (player == null)
             return;
 
@@ -167,21 +202,17 @@ public class VehicleSpawner : MonoBehaviour
 
         exitPosition.y = player.transform.position.y;
 
-        PlayerFootstepAudio footstepAudio =
-            player.GetComponent<PlayerFootstepAudio>();
-
+        PlayerFootstepAudio footstepAudio = player.GetComponent<PlayerFootstepAudio>();
         if (footstepAudio != null)
             footstepAudio.StopFootsteps();
 
         SetVehiclePlayerComponentsActive(false);
-
         _vehiclePlayerObject.SetActive(false);
 
         player.transform.position = exitPosition;
         player.gameObject.SetActive(true);
 
         player.SetVehicleState(Player.VehicleState.NotInVehicle);
-
         PlayerFootstepAudio.isOnSeat = false;
 
         UpdateInteractionZone();
@@ -192,9 +223,7 @@ public class VehicleSpawner : MonoBehaviour
         if (_interactionEvent.IsNull)
             return;
 
-        RuntimeManager.PlayOneShot(
-            _interactionEvent,
-            transform.position);
+        RuntimeManager.PlayOneShot(_interactionEvent, transform.position);
     }
 
     private Vector3 GetInteractionPosition()
@@ -205,13 +234,10 @@ public class VehicleSpawner : MonoBehaviour
         return transform.position;
     }
 
-    private float GetHorizontalDistance(
-        Vector3 firstPosition,
-        Vector3 secondPosition)
+    private float GetHorizontalDistance(Vector3 firstPosition, Vector3 secondPosition)
     {
         firstPosition.y = 0f;
         secondPosition.y = 0f;
-
         return Vector3.Distance(firstPosition, secondPosition);
     }
 
@@ -227,11 +253,9 @@ public class VehicleSpawner : MonoBehaviour
                 case Behaviour behaviour:
                     behaviour.enabled = isActive;
                     break;
-
                 case Collider collider:
                     collider.enabled = isActive;
                     break;
-
                 case Renderer renderer:
                     renderer.enabled = isActive;
                     break;
