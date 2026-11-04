@@ -294,7 +294,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &87327264
 Transform:
   m_ObjectHideFlags: 0
@@ -531,6 +531,10 @@ PrefabInstance:
       value: TRACK_BOT (1)
       objectReference: {fileID: 0}
     - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
       propertyPath: splineIndex
       value: 1
       objectReference: {fileID: 0}
@@ -541,100 +545,41 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5450809871942592670, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      insertIndex: 4
+      addedObject: {fileID: 244887866}
   m_SourcePrefab: {fileID: 100100000, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
---- !u!1 &260585735
+--- !u!1 &244887865 stripped
 GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 5450809871942592670, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+  m_PrefabInstance: {fileID: 244887864}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 260585737}
-  - component: {fileID: 260585736}
-  m_Layer: 0
-  m_Name: Spline (1)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &260585736
+--- !u!114 &244887866
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 260585735}
+  m_GameObject: {fileID: 244887865}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dab5c7d4c32e743048dfca98e2d5914f, type: 3}
+  m_Script: {fileID: 11500000, guid: 79aae047d4f8f0d4aa9cd9f1dd6def9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Spline:
-    m_EditModeType: 1
-    m_Knots: []
-    m_MetaData: []
-    m_Closed: 0
-    m_IntData:
-      m_Data: []
-    m_FloatData:
-      m_Data: []
-    m_Float4Data:
-      m_Data: []
-    m_ObjectData:
-      m_Data: []
-  m_Splines:
-  - m_EditModeType: 1
-    m_Knots:
-    - Position:
-        x: 0
-        y: 0
-        z: 0
-      TangentIn:
-        x: -0
-        y: -0
-        z: -0
-      TangentOut:
-        x: 0
-        y: 0
-        z: 0
-      Rotation:
-        value:
-          x: 0
-          y: 0
-          z: 0
-          w: 1
-    m_MetaData:
-    - Mode: 0
-      Tension: 0.5
-    m_Closed: 0
-    m_IntData:
-      m_Data: []
-    m_FloatData:
-      m_Data: []
-    m_Float4Data:
-      m_Data: []
-    m_ObjectData:
-      m_Data: []
-  m_Knots:
-    m_KnotsLink: []
---- !u!4 &260585737
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 260585735}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -57.92928, y: 0, z: -13.976669}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  splineContainer: {fileID: 2061515336}
+  laneOffsetDistance: 10
+  maxRoadBoundary: 10
+  personality: 1
+  currentLane: 0
+  baseMaxSpeed: 500
+  physicalBrakePower: 100
+  baseLookAhead: 25
+  speedLookAheadFactor: 0.2
+  cornerCheckDistance: 35
+  bullySearchRadius: 25
+  predictionFactor: 0.15
+  steerDeadzone: 1
 --- !u!1 &285122858
 GameObject:
   m_ObjectHideFlags: 0
@@ -729,18 +674,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
---- !u!114 &511222424 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1204118677679161497, guid: b93743e8579c1104d94e0498b67b7074, type: 3}
-  m_PrefabInstance: {fileID: 7442413139159128713}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dab5c7d4c32e743048dfca98e2d5914f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!43 &528063239
+--- !u!43 &351286000
 Mesh:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -915,6 +849,17 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!114 &511222424 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1204118677679161497, guid: b93743e8579c1104d94e0498b67b7074, type: 3}
+  m_PrefabInstance: {fileID: 7442413139159128713}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dab5c7d4c32e743048dfca98e2d5914f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &737670432 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4505734340842329029, guid: 0bedd38a78d122a45b5f3c6e57f809e2, type: 3}
@@ -1405,6 +1350,10 @@ PrefabInstance:
       value: TRACK_BOT (2)
       objectReference: {fileID: 0}
     - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
       propertyPath: splineIndex
       value: 1
       objectReference: {fileID: 0}
@@ -1415,8 +1364,41 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5450809871942592670, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      insertIndex: 4
+      addedObject: {fileID: 1190580823}
   m_SourcePrefab: {fileID: 100100000, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+--- !u!1 &1190580822 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5450809871942592670, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+  m_PrefabInstance: {fileID: 1190580821}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1190580823
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1190580822}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79aae047d4f8f0d4aa9cd9f1dd6def9d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  splineContainer: {fileID: 2061515336}
+  laneOffsetDistance: 8
+  maxRoadBoundary: 10
+  personality: 2
+  currentLane: 1
+  baseMaxSpeed: 500
+  physicalBrakePower: 100
+  baseLookAhead: 25
+  speedLookAheadFactor: 0.2
+  cornerCheckDistance: 35
+  bullySearchRadius: 25
+  predictionFactor: 0.15
+  steerDeadzone: 1
 --- !u!1001 &1308766424
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2438,7 +2420,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2061515332}
-  m_Mesh: {fileID: 528063239}
+  m_Mesh: {fileID: 351286000}
 --- !u!114 &2061515336
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2675,7 +2657,7 @@ MeshCollider:
   serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
-  m_Mesh: {fileID: 528063239}
+  m_Mesh: {fileID: 351286000}
 --- !u!1 &2105311873 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2346544726612211625, guid: 29e1f9a020fd7a3468360bf5a00b0f1d, type: 3}
@@ -2893,9 +2875,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5284332621358873635, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: accelerationMultiplier
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 5450809871942592670, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
       propertyPath: m_Name
       value: TRACK_BOT
+      objectReference: {fileID: 0}
+    - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
       propertyPath: splineIndex
@@ -2908,8 +2898,41 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5450809871942592670, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      insertIndex: 4
+      addedObject: {fileID: 2799573640635076271}
   m_SourcePrefab: {fileID: 100100000, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+--- !u!1 &2799573640635076270 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5450809871942592670, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+  m_PrefabInstance: {fileID: 2799573640635076269}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2799573640635076271
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2799573640635076270}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79aae047d4f8f0d4aa9cd9f1dd6def9d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  splineContainer: {fileID: 2061515336}
+  laneOffsetDistance: 10
+  maxRoadBoundary: 10
+  personality: 0
+  currentLane: -1
+  baseMaxSpeed: 500
+  physicalBrakePower: 100
+  baseLookAhead: 25
+  speedLookAheadFactor: 0.2
+  cornerCheckDistance: 35
+  bullySearchRadius: 25
+  predictionFactor: 0.15
+  steerDeadzone: 1
 --- !u!1001 &4182832883131380197
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3126,6 +3149,10 @@ PrefabInstance:
     - target: {fileID: 1122667979196912701, guid: b93743e8579c1104d94e0498b67b7074, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1204118677679161497, guid: b93743e8579c1104d94e0498b67b7074, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1204118677679161497, guid: b93743e8579c1104d94e0498b67b7074, type: 3}
       propertyPath: m_Splines.Array.size
@@ -4251,6 +4278,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: NavMesh
       objectReference: {fileID: 0}
+    - target: {fileID: 8515570955645847634, guid: b93743e8579c1104d94e0498b67b7074, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4276,4 +4307,3 @@ SceneRoots:
   - {fileID: 1049614133}
   - {fileID: 1966305090}
   - {fileID: 2061515337}
-  - {fileID: 260585737}
