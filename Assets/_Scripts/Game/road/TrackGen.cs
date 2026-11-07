@@ -13,7 +13,7 @@ using UnityEditor;
 // Сам меш дороги строит RoadBuilder.
 [ExecuteAlways]
 [RequireComponent(typeof(SplineContainer))]
-public class TrackGen : MonoBehaviour
+public class TrackGen: MonoBehaviour
 {
     public enum Layout
     {
@@ -24,12 +24,33 @@ public class TrackGen : MonoBehaviour
         Serpentine,         // серпантин
         TrefoilKnot,        // узел-трилистник: 3 путепровода, дорога то вверх, то вниз
         SpiralClimb,        // спираль: 2 витка вверх на 36 м, длинный спуск, внизу дорога проезжает под спиралью
+        Star,               // звезда с 5-20 лучами (Star Points), Star Skip = как «густо» прошита
+        MooreFractal,       // фрактальная кривая Мура: сотни поворотов, пересечений нет
+        KochSnowflake,      // снежинка Коха: фрактальная кайма из 60-градусных шпилек
         Custom              // свои углы из списка Custom Points
     }
 
     [Header("Форма трассы")]
     public Layout layout = Layout.Cloverleaf;
     [Min(0.2f)] public float layoutScale = 1f;
+    [Tooltip("Сколько раз повторить выбранную фигуру в ряд. Копии соединяются в ОДНУ линию дороги (один старт/финиш). 1 = без повтора")]
+    [Range(1, 10)] public int repeatCount = 1;
+    [Tooltip("Просвет между копиями, м (до Layout Scale не масштабируется)")]
+    [Min(10f)] public float repeatGap = 40f;
+
+    [Header("Звезда (Layout = Star)")]
+    [Range(5, 20)] public int starPoints = 7;
+    [Tooltip("Через сколько лучей соединять: 2 = обычная звезда, 3 = глубже. Если число не взаимно простое с количеством лучей, берётся ближайшее подходящее. " +
+             "Большие значения дают много пересечений: увеличь Star Radius, иначе эстакады не уложатся в уклон (смотри предупреждение в консоли)")]
+    [Range(1, 9)] public int starSkip = 2;
+    [Min(150f)] public float starRadius = 520f;
+    [Min(15f)] public float starTipRadius = 45f;
+
+    [Header("Фракталы (Layout = MooreFractal / KochSnowflake)")]
+    [Tooltip("Мур: порядок 2-4 (4 даёт ~23 км и ~1000 поворотов). Коха: 1-2")]
+    [Range(1, 4)] public int fractalOrder = 3;
+    [Tooltip("Мур: длина одной клетки, м (70). Коха: сторона всей снежинки, м (если меньше 200, берётся 900)")]
+    [Min(30f)] public float fractalSize = 70f;
 
     [Header("Клеверный лист")]
     [Min(30f)] public float cloverLoopRadius = 70f;
@@ -63,9 +84,25 @@ public class TrackGen : MonoBehaviour
     public Terrain terrain;
     [Tooltip("Насколько сглаживать рельеф вдоль дороги, м (больше = ровнее дорога, больше насыпей и выемок)")]
     [Min(10f)] public float terrainSmoothing = 70f;
+    [Tooltip("Прижатие к рельефу. 1 = дорога повторяет рельеф (с учётом сглаживания). 0 = дорога почти не лезёт вверх-вниз за холмами: " +
+             "над впадинами получаются плавные мосты на опорах, холмы прорезаются выемкой")]
+    [Range(0f, 1f)] public float terrainHug = 0.7f;
+    [Tooltip("Максимальная крутизна дороги (0.06 = 6%). Меньше = положе, на крутых склонах дорога идёт как плавный мост/выемка")]
     [Range(0.02f, 0.15f)] public float terrainMaxGrade = 0.06f;
-    [Tooltip("Насколько дорога выше поверхности рельефа в среднем, м")]
-    public float roadLift = 0.2f;
+    [Tooltip("Насколько дорога в среднем выше поверхности рельефа, м")]
+    public float roadLift = 0.4f;
+
+    [Header("Ответвления: запасные дороги (срезки, обманки, возвраты)")]
+    [Tooltip("Сколько боковых дорог добавить к трассе. Появляются как дочерние объекты Branch_N со своим RoadBuilder. 0 = нет")]
+    [Range(0, 12)] public int branchCount = 3;
+    [Tooltip("Случайное зерно. Поменяй число, получишь другой набор ответвлений (правая кнопка на компоненте → Reroll Branches)")]
+    public int branchSeed = 1;
+    [Min(60f)] public float branchMinLength = 150f;
+    [Min(100f)] public float branchMaxLength = 450f;
+    [Tooltip("Ширина боковой дороги относительно основной")]
+    [Range(0.4f, 1f)] public float branchWidthScale = 0.75f;
+    [Tooltip("Разрешить петли-обманки: съехал, дорога разворачивает и выводит на основную чуть раньше по трассе, навстречу движению")]
+    public bool allowBacktrack = true;
 
     [Header("Генерация")]
     [Min(1.5f)] public float sampleSpacing = 3f;
@@ -225,6 +262,8 @@ public class TrackGen : MonoBehaviour
         spline.Closed = true;
         spline.SetTangentMode(TangentMode.AutoSmooth);
 
+        BuildBranches(P, straight, s, L, h, cr, i0, ds);
+
         // ---- точка старта для гизмо
         Vector3 s0 = transform.TransformPoint(new Vector3(P[i0].x, 0f, P[i0].y));
         s0.y = h[i0];
@@ -249,6 +288,271 @@ public class TrackGen : MonoBehaviour
         if (showDebug)
             Debug.Log($"Трасса {layout}: длина {L:F0} м, узлов {count}, пересечений {cr.Count}, " +
                       $"эстакадных участков {clusters}, мин. зазор {(cr.Count > 0 ? worst : 0f):F1} м", this);
+    }
+
+
+    // ------------------------------------------------------------------ ответвления
+
+    const string BranchPrefix = "Branch_";
+
+    [ContextMenu("Reroll Branches")]
+    public void RerollBranches()
+    {
+        branchSeed = Random.Range(0, 1000000);
+        Generate();
+    }
+
+    void ClearBranches()
+    {
+        for (int i = transform.childCount - 1; i >= 0; i--)
+        {
+            Transform c = transform.GetChild(i);
+            if (!c.name.StartsWith(BranchPrefix))
+                continue;
+            if (Application.isPlaying) Destroy(c.gameObject);
+            else DestroyImmediate(c.gameObject);
+        }
+    }
+
+    // Случайные боковые дороги: срезка (чуть короче основной), «блуждалка» (дольше), петля-обманка
+    // (разворачивает и выходит на основную дорогу раньше по трассе). Ответвление не пересекает ни основную дорогу,
+    // ни другие ответвления, а на концах плавно вливается в основную дорогу под тем же углом и на той же высоте.
+    void BuildBranches(Vector2[] P, bool[] straight, float[] s, float L, float[] h,
+                       List<Crossing> cr, int i0, float ds)
+    {
+        ClearBranches();
+        if (branchCount <= 0)
+            return;
+
+        RoadBuilder main = GetComponent<RoadBuilder>();
+        if (main == null)
+            Debug.LogWarning("TrackGenerator: на этом объекте нет RoadBuilder, ответвления получатся без меша.", this);
+
+        Terrain terr = followTerrain ? (terrain != null ? terrain : Terrain.activeTerrain) : null;
+        var rng = new System.Random(branchSeed);
+        int n = P.Length;
+        float minSep = roadWidth + 4f;
+        const float step = 4f;
+        var used = new List<float> { s[i0] };       // s-координаты занятых мест (старт, развилки, слияния)
+        var others = new List<List<Vector2>>();
+        int made = 0;
+
+        System.Func<float, bool> free = sv =>
+        {
+            foreach (float e in used)
+                if (Mathf.Abs(Wrap(sv - e, L)) < 110f) return false;
+            foreach (Crossing c in cr)
+                if (Mathf.Abs(Wrap(sv - c.sa, L)) < 45f || Mathf.Abs(Wrap(sv - c.sb, L)) < 45f) return false;
+            return true;
+        };
+        System.Func<int, Vector2> dirAt = i =>
+        {
+            Vector2 d = P[(i + 1) % n] - P[(i - 1 + n) % n];
+            return d.sqrMagnitude < 1e-6f ? Vector2.right : d.normalized;
+        };
+
+        float maxLen = Mathf.Min(branchMaxLength, L * 0.35f);
+        float minLen = Mathf.Min(branchMinLength, maxLen * 0.6f);
+
+        for (int attempt = 0; attempt < branchCount * 150 && made < branchCount; attempt++)
+        {
+            int iF = rng.Next(n);
+            if (!straight[iF]) continue;
+            float sF = s[iF];
+            if (!free(sF)) continue;
+
+            double roll = rng.NextDouble();
+            int type = roll < 0.4 ? 0 : (roll < 0.75 || !allowBacktrack ? 1 : 2);   // 0 срезка, 1 блуждалка, 2 обманка
+            float D = Mathf.Lerp(type == 2 ? 80f : minLen, type == 2 ? 220f : maxLen, (float)rng.NextDouble());
+            float sM = type == 2 ? sF - D : sF + D;
+            sM = ((sM % L) + L) % L;
+            int iM = IndexAt(s, sM);
+            if (!straight[iM] || !free(sM)) continue;
+            if (Mathf.Abs(Wrap(sM - sF, L)) < 60f) continue;
+
+            Vector2 a = P[iF], b = P[iM];
+            Vector2 fF = dirAt(iF), fM = dirAt(iM);
+            float side = rng.NextDouble() < 0.5 ? -1f : 1f;
+            Vector2 nrm = new Vector2(-fF.y, fF.x) * side;
+            Vector2 nrmM = new Vector2(-fM.y, fM.x) * side;
+            Vector2 mid = 0.5f * (a + b);
+            float R01() => (float)rng.NextDouble();
+
+            var c = new List<Vector2> { a };
+            Vector2 t0 = fF, t1 = type == 2 ? -fM : fM;
+            if (type == 0)
+            {
+                c.Add(mid + nrm * Mathf.Lerp(-10f, 25f, R01()));
+            }
+            else if (type == 1)
+            {
+                c.Add(Vector2.Lerp(a, b, 0.3f) + nrm * Mathf.Lerp(45f, 130f, R01()));
+                c.Add(Vector2.Lerp(a, b, 0.7f) + nrm * Mathf.Lerp(-30f, 130f, R01()));
+            }
+            else
+            {
+                c.Add(a + fF * Mathf.Lerp(50f, 90f, R01()) + nrm * Mathf.Lerp(25f, 45f, R01()));
+                c.Add(mid + nrm * Mathf.Lerp(120f, 230f, R01()));
+                c.Add(b + fM * Mathf.Lerp(60f, 100f, R01()) + nrmM * Mathf.Lerp(20f, 40f, R01()));
+            }
+            c.Add(b);
+
+            List<Vector2> pts = Hermite(c, t0, t1, step);
+            if (pts.Count < 8) continue;
+
+            var arc = new float[pts.Count];
+            for (int i = 1; i < pts.Count; i++)
+                arc[i] = arc[i - 1] + Vector2.Distance(pts[i], pts[i - 1]);
+            float Lb = arc[pts.Count - 1];
+            if (type == 0 && Lb > 0.93f * D) continue;
+            if (type == 1 && Lb < 1.15f * D) continue;
+
+            // не слишком острые повороты
+            bool ok = true;
+            for (int i = 2; i < pts.Count - 2 && ok; i++)
+            {
+                Vector2 p0 = pts[i - 2], p1 = pts[i], p2 = pts[i + 2];
+                float cross = Mathf.Abs((p1.x - p0.x) * (p2.y - p0.y) - (p1.y - p0.y) * (p2.x - p0.x));
+                if (cross < 1e-3f) continue;
+                float rad = (p1 - p0).magnitude * (p2 - p1).magnitude * (p2 - p0).magnitude / (2f * cross);
+                if (rad < 26f) ok = false;
+            }
+            if (!ok) continue;
+
+            // не лезем на основную дорогу и на другие ответвления
+            for (int j = 0; j < pts.Count && ok; j++)
+            {
+                float fromEnd = Mathf.Min(arc[j], Lb - arc[j]);
+                float t = Mathf.Clamp01((fromEnd - 20f) / 70f);
+                float need = minSep * t;
+                if (need > 0f)
+                {
+                    float nsq = need * need;
+                    for (int k = 0; k < n; k += 2)
+                        if ((P[k] - pts[j]).sqrMagnitude < nsq) { ok = false; break; }
+                }
+                if (!ok) break;
+                float osq = minSep * minSep;
+                foreach (var o in others)
+                {
+                    for (int k = 0; k < o.Count; k++)
+                        if ((o[k] - pts[j]).sqrMagnitude < osq) { ok = false; break; }
+                    if (!ok) break;
+                }
+            }
+            if (!ok) continue;
+
+            // ---- высоты
+            float hF = h[iF], hM = h[iM];
+            int m = pts.Count;
+            var bh = new float[m];
+            if (terr != null)
+            {
+                float oy = terr.GetPosition().y;
+                var raw = new float[m];
+                for (int i = 0; i < m; i++)
+                    raw[i] = terr.SampleHeight(transform.TransformPoint(new Vector3(pts[i].x, 0f, pts[i].y))) + oy;
+                int hwL = Mathf.Max(1, Mathf.RoundToInt(terrainSmoothing / step * 0.5f));
+                int hwH = Mathf.Max(hwL, Mathf.RoundToInt(terrainSmoothing * 3.5f / step * 0.5f));
+                for (int i = 0; i < m; i++)
+                {
+                    float sl = 0f, sh = 0f;
+                    int cl = 0, ch = 0;
+                    for (int k = -hwH; k <= hwH; k++)
+                    {
+                        int q = Mathf.Clamp(i + k, 0, m - 1);
+                        sh += raw[q]; ch++;
+                        if (Mathf.Abs(k) <= hwL) { sl += raw[q]; cl++; }
+                    }
+                    bh[i] = Mathf.Lerp(sh / ch, sl / cl, terrainHug);
+                }
+                float lim = terrainMaxGrade * step;
+                for (int round = 0; round < 3; round++)
+                {
+                    for (int i = 1; i < m; i++) bh[i] = Mathf.Clamp(bh[i], bh[i - 1] - lim, bh[i - 1] + lim);
+                    for (int i = m - 2; i >= 0; i--) bh[i] = Mathf.Clamp(bh[i], bh[i + 1] - lim, bh[i + 1] + lim);
+                }
+                for (int i = 0; i < m; i++) bh[i] += roadLift;
+                float d0 = hF - bh[0], d1 = hM - bh[m - 1];
+                float r0 = Mathf.Clamp(1.5f * Mathf.Abs(d0) / 0.05f, 60f, Lb * 0.6f);
+                float r1 = Mathf.Clamp(1.5f * Mathf.Abs(d1) / 0.05f, 60f, Lb * 0.6f);
+                for (int i = 0; i < m; i++)
+                    bh[i] += d0 * Smooth(1f - arc[i] / r0) + d1 * Smooth(1f - (Lb - arc[i]) / r1);
+            }
+            else
+            {
+                for (int i = 0; i < m; i++)
+                    bh[i] = Mathf.Lerp(hF, hM, Smooth(arc[i] / Lb));
+            }
+
+            // ---- объект ответвления
+            var go = new GameObject(BranchPrefix + (made + 1));
+            go.transform.SetParent(transform, false);
+            var sc = go.AddComponent<SplineContainer>();
+            Spline sp = sc.Spline;
+            sp.Clear();
+            float nextArc = 0f;
+            for (int i = 0; i < m; i++)
+            {
+                if (i != m - 1 && arc[i] < nextArc) continue;
+                nextArc = arc[i] + knotSpacing;
+                Vector3 w = transform.TransformPoint(new Vector3(pts[i].x, 0f, pts[i].y));
+                w.y = bh[i] + 0.03f;
+                sp.Add(new BezierKnot(go.transform.InverseTransformPoint(w)));
+            }
+            sp.Closed = false;
+            sp.SetTangentMode(TangentMode.AutoSmooth);
+
+            if (main != null)
+            {
+                var rb = go.AddComponent<RoadBuilder>();
+                foreach (var f in typeof(RoadBuilder).GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
+                    if (f.Name != "container")
+                        f.SetValue(rb, f.GetValue(main));
+                rb.container = sc;
+                rb.roadWidth = main.roadWidth * branchWidthScale;
+                rb.Rebuild();
+            }
+
+            others.Add(pts);
+            used.Add(sF);
+            used.Add(sM);
+            made++;
+#if UNITY_EDITOR
+            if (!Application.isPlaying)
+                EditorUtility.SetDirty(go);
+#endif
+        }
+
+        if (made < branchCount)
+            Debug.Log($"Ответвления: удалось разместить {made} из {branchCount}. Не хватило места без пересечений: " +
+                      "увеличь Layout Scale, уменьши Branch Count или смени Branch Seed.", this);
+    }
+
+    // Кубический Эрмит через точки; на концах заданы направления, внутри касательные по Катмулу-Рому.
+    static List<Vector2> Hermite(List<Vector2> c, Vector2 t0, Vector2 t1, float step)
+    {
+        int k = c.Count;
+        var m = new Vector2[k];
+        for (int i = 1; i < k - 1; i++)
+            m[i] = 0.5f * (c[i + 1] - c[i - 1]);
+        m[0] = t0 * Vector2.Distance(c[0], c[1]);
+        m[k - 1] = t1 * Vector2.Distance(c[k - 1], c[k - 2]);
+        var o = new List<Vector2>();
+        for (int i = 0; i < k - 1; i++)
+        {
+            float len = Vector2.Distance(c[i], c[i + 1]);
+            int steps = Mathf.Max(2, Mathf.CeilToInt(len * 1.2f / step));
+            for (int q = 0; q < steps; q++)
+            {
+                float u = (float)q / steps;
+                float u2 = u * u, u3 = u2 * u;
+                o.Add((2f * u3 - 3f * u2 + 1f) * c[i] + (u3 - 2f * u2 + u) * m[i] +
+                      (-2f * u3 + 3f * u2) * c[i + 1] + (u3 - u2) * m[i + 1]);
+            }
+        }
+        o.Add(c[k - 1]);
+        return o;
     }
 
     // ------------------------------------------------------------------ формы
@@ -309,6 +613,18 @@ public class TrackGen : MonoBehaviour
                 AddSpiral(w);
                 break;
 
+            case Layout.Star:
+                AddStar(w);
+                break;
+
+            case Layout.MooreFractal:
+                AddMoore(w);
+                break;
+
+            case Layout.KochSnowflake:
+                AddKoch(w);
+                break;
+
             case Layout.Custom:
                 for (int i = 0; i < customPoints.Count; i++)
                     w.Add(new Wp(customPoints[i], customRadius, i < customHeights.Count ? customHeights[i] : 0f));
@@ -317,7 +633,154 @@ public class TrackGen : MonoBehaviour
 
         for (int i = 0; i < w.Count; i++)
             w[i] = new Wp(w[i].p * layoutScale, w[i].r * layoutScale, w[i].h * layoutScale);
-        return w;
+        return TileRow(w, repeatCount, repeatGap);
+    }
+
+    // Повтор: n копий в ряд вдоль X. У соседних копий вырезается по одному ребру (правое у левой копии,
+    // левое у правой) и концы соединяются двумя перемычками. Получается одна замкнутая линия: низ копий слева направо,
+    // потом верх копий справа налево. Все остальные углы фигуры остаются на месте.
+    static List<Wp> TileRow(List<Wp> b, int n, float gap)
+    {
+        int m = b.Count;
+        if (n <= 1 || m < 4) return b;
+
+        int jr = 0;
+        for (int j = 1; j < m; j++)
+            if (b[j].p.x + b[(j + 1) % m].p.x > b[jr].p.x + b[(jr + 1) % m].p.x) jr = j;
+        int jl = -1;
+        for (int j = 0; j < m; j++)
+        {
+            if (j == jr || (j + 1) % m == jr || (jr + 1) % m == j) continue;
+            if (jl < 0 || b[j].p.x + b[(j + 1) % m].p.x < b[jl].p.x + b[(jl + 1) % m].p.x) jl = j;
+        }
+        if (jl < 0) return b;
+
+        float minX = float.MaxValue, maxX = float.MinValue, minY = float.MaxValue, maxY = float.MinValue;
+        for (int i = 0; i < m; i++)
+        {
+            minX = Mathf.Min(minX, b[i].p.x); maxX = Mathf.Max(maxX, b[i].p.x);
+            minY = Mathf.Min(minY, b[i].p.y); maxY = Mathf.Max(maxY, b[i].p.y);
+        }
+        Vector2 c = new Vector2(0.5f * (minX + maxX), 0.5f * (minY + maxY));
+        float pitch = (maxX - minX) + gap;
+
+        int lStart = (jl + 1) % m;   // начало «нижней» дуги (за вырезанным левым ребром)
+        int rEnd = jr;               // конец «нижней» дуги (перед вырезанным правым ребром)
+        int rStart = (jr + 1) % m;   // начало «верхней» дуги
+        int lEnd = jl;               // конец «верхней» дуги
+
+        var o = new List<Wp>(m * n);
+        void Arc(int copy, int a, int z, bool skipEnds)
+        {
+            float dx = (copy - 0.5f * (n - 1)) * pitch;
+            int i = a;
+            bool first = true;
+            while (true)
+            {
+                bool last = i == z;
+                if (!(skipEnds && (first || last)))
+                {
+                    var p = b[i];
+                    o.Add(new Wp(p.p - c + new Vector2(dx, 0f), p.r, p.h));
+                }
+                if (last) break;
+                first = false;
+                i = (i + 1) % m;
+            }
+        }
+
+        for (int k = 0; k < n; k++) Arc(k, lStart, rEnd, false);
+        for (int k = n - 1; k >= 0; k--) Arc(k, rStart, lEnd, false);
+        return o;
+    }
+
+    static int Gcd(int a, int b) { while (b != 0) { int t = a % b; a = b; b = t; } return a; }
+
+    // Звезда {n/k}: вершины на окружности, дорога соединяет каждую k-ю. k подбирается взаимно простым с n,
+    // иначе звезда распадается на несколько отдельных фигур (например 6/2 = два треугольника).
+    void AddStar(List<Wp> w)
+    {
+        int n = starPoints;
+        int hi = Mathf.Max(1, (n - 1) / 2);
+        int k = Mathf.Clamp(starSkip, 1, hi);
+        int pick = 1;
+        bool found = false;
+        for (int c = k; c <= hi && !found; c++) if (Gcd(n, c) == 1) { pick = c; found = true; }
+        for (int c = k - 1; c >= 1 && !found; c--) if (Gcd(n, c) == 1) { pick = c; found = true; }
+        if (pick != starSkip)
+            Debug.Log($"Звезда {n} лучей: Star Skip {starSkip} не подходит, взят {pick}", this);
+        for (int j = 0; j < n; j++)
+        {
+            float a = -Mathf.PI * 0.5f + 2f * Mathf.PI * ((j * pick) % n) / n;
+            w.Add(new Wp(starRadius * Mathf.Cos(a), starRadius * Mathf.Sin(a), starTipRadius));
+        }
+    }
+
+    // L-система: правила применяются order раз, потом «черепашка» рисует путь (F = шаг, +/- = поворот).
+    static string LSystem(string axiom, Dictionary<char, string> rules, int order)
+    {
+        string s = axiom;
+        for (int i = 0; i < order; i++)
+        {
+            var sb = new System.Text.StringBuilder();
+            foreach (char ch in s)
+            {
+                string r;
+                if (rules.TryGetValue(ch, out r)) sb.Append(r); else sb.Append(ch);
+            }
+            s = sb.ToString();
+        }
+        return s;
+    }
+
+    static List<Vector2> Turtle(string s, float step, float turnDeg)
+    {
+        var pts = new List<Vector2> { Vector2.zero };
+        Vector2 pos = Vector2.zero;
+        float ang = 0f;
+        foreach (char ch in s)
+        {
+            if (ch == 'F')
+            {
+                pos += step * new Vector2(Mathf.Cos(ang), Mathf.Sin(ang));
+                pts.Add(pos);
+            }
+            else if (ch == '+') ang += turnDeg * Mathf.Deg2Rad;
+            else if (ch == '-') ang -= turnDeg * Mathf.Deg2Rad;
+        }
+        return pts;
+    }
+
+    static void AddCentered(List<Wp> w, List<Vector2> pts, float r)
+    {
+        Vector2 mn = pts[0], mx = pts[0];
+        foreach (var p in pts) { mn = Vector2.Min(mn, p); mx = Vector2.Max(mx, p); }
+        Vector2 c = 0.5f * (mn + mx);
+        foreach (var p in pts) w.Add(new Wp(p - c, r));
+    }
+
+    // Кривая Мура (замкнутая версия кривой Гильберта): заполняет квадрат, сама себя не пересекает.
+    // Порядок 3 = 64 клетки, около 4 км при клетке 70 м.
+    void AddMoore(List<Wp> w)
+    {
+        int order = Mathf.Clamp(fractalOrder, 2, 4);
+        string s = LSystem("LFL+F+LFL",
+            new Dictionary<char, string> { { 'L', "-RF+LFL+FR-" }, { 'R', "+LF-RFR-FL+" } }, order - 1);
+        var pts = Turtle(s, fractalSize, 90f);
+        if (pts.Count > 1 && (pts[0] - pts[pts.Count - 1]).sqrMagnitude < 0.01f) pts.RemoveAt(pts.Count - 1);
+        AddCentered(w, pts, fractalSize * 0.4f);
+    }
+
+    // Снежинка Коха: треугольник, у которого каждая сторона превращена в «зубец». Уровень 2 = 48 сторон.
+    // Уровень 3 не влезает в радиусы скруглений.
+    void AddKoch(List<Wp> w)
+    {
+        int level = Mathf.Clamp(fractalOrder, 1, 2);
+        float side = fractalSize > 200f ? fractalSize : 900f;
+        string s = LSystem("F--F--F", new Dictionary<char, string> { { 'F', "F+F--F+F" } }, level);
+        var pts = Turtle(s, side / Mathf.Pow(3f, level), 60f);
+        if (pts.Count > 1 && (pts[0] - pts[pts.Count - 1]).sqrMagnitude < 0.01f) pts.RemoveAt(pts.Count - 1);
+        AddCentered(w, pts, Mathf.Min(35f, side / 26f));
     }
 
     // Трилистник: x = sin t + 2 sin 2t, y = cos t - 2 cos 2t. Скругления с огромным радиусом
@@ -676,15 +1139,15 @@ public class TrackGen : MonoBehaviour
                 raw[i] = t.SampleHeight(w) + oy;
             }
 
-            // скользящее среднее по кругу
-            int hw = Mathf.Max(1, Mathf.RoundToInt(terrainSmoothing / ds * 0.5f));
+            // два сглаживания по кругу: лёгкое (повторяет рельеф) и тяжёлое (плавный «мост» через неровности)
+            int hwL = Mathf.Max(1, Mathf.RoundToInt(terrainSmoothing / ds * 0.5f));
+            int hwH = Mathf.Max(hwL, Mathf.RoundToInt(terrainSmoothing * 3.5f / ds * 0.5f));
+            hwL = Mathf.Min(hwL, n / 2 - 1);
+            hwH = Mathf.Min(hwH, n / 2 - 1);
+            float[] light = CircAverage(raw, hwL);
+            float[] heavy = CircAverage(raw, hwH);
             for (int i = 0; i < n; i++)
-            {
-                float sum = 0f;
-                for (int k = -hw; k <= hw; k++)
-                    sum += raw[((i + k) % n + n) % n];
-                baseH[i] = sum / (2 * hw + 1);
-            }
+                baseH[i] = Mathf.Lerp(heavy[i], light[i], terrainHug);
 
             LimitSlope(baseH, seg, terrainMaxGrade);
             Consensus(baseH, s, L, cr);
@@ -874,6 +1337,20 @@ public class TrackGen : MonoBehaviour
             }
         }
         return h;
+    }
+
+    static float[] CircAverage(float[] raw, int hw)
+    {
+        int n = raw.Length;
+        var o = new float[n];
+        for (int i = 0; i < n; i++)
+        {
+            float sum = 0f;
+            for (int k = -hw; k <= hw; k++)
+                sum += raw[((i + k) % n + n) % n];
+            o[i] = sum / (2 * hw + 1);
+        }
+        return o;
     }
 
     // Ограничение уклона по кругу (вперёд-назад, несколько раз).
