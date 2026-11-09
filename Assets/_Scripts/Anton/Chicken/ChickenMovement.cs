@@ -18,19 +18,14 @@ public class ChickenMovement : MonoBehaviour
     private IEntityRegistry<IEntity> _entityRegistry;
     private Transform _overrideTargetTransform;
     private float _verticalVelocity;
+    private float _jumpCooldownTimer;
 
-    // Динамические коэффициенты текущей функции скорости V(t) = a * t + b
-    private float _currentA;
-    private float _currentB;
     private float _currentMaxSpeed;
-    private float _movementTimer;
 
-    // Индивидуальные уникальные характеристики этой конкретной курицы
-    private float _individualDistanceOffset;  // Отклонение дистанции (в пределах +-5м)
-    private float _individualFleeAngleOffset;  // Сдвиг угла побега
-    private float _individualSpeedMultiplier;  // Физическая форма (множитель скорости)
+    private float _individualDistanceOffset;
+    private float _individualFleeAngleOffset;
+    private float _individualSpeedMultiplier;
 
-    
     private MovementMode _currentMovementMode;
 
     [Inject]
@@ -40,6 +35,39 @@ public class ChickenMovement : MonoBehaviour
     }
 
     private void Awake() => _controller = GetComponent<CharacterController>();
+
+    public void Initialize(ChickenSettings settings, Transform target = null)
+    {
+        _settings = settings;
+        if (target != null)
+            _overrideTargetTransform = target;
+
+        GenerateIndividualTraits();
+        SetMovementMode(MovementMode.Walk);
+        ApplyWallPassThrough();
+    }
+
+    /// <summary>
+    /// Отключает столкновения слоя курицы со слоями стен. Работает с CharacterController,
+    /// в отличие от Physics.IgnoreCollision. Забор должен быть на ОТДЕЛЬНОМ слое —
+    /// его в маску не включаем, иначе куры будут проходить и через него.
+    /// </summary>
+    private void ApplyWallPassThrough()
+    {
+        if (_settings == null || _controller == null) return;
+
+        int wallMask = _settings.PassThroughWallsMask.value;
+        if (wallMask == 0) return;
+
+        int chickenLayer = gameObject.layer;
+        for (int i = 0; i < 32; i++)
+        {
+            if ((wallMask & (1 << i)) != 0)
+                Physics.IgnoreLayerCollision(chickenLayer, i, true);
+        }
+    }
+
+    public void RefreshWallPassThrough() => ApplyWallPassThrough();
 
     private Transform TargetTransform
     {
@@ -58,6 +86,7 @@ public class ChickenMovement : MonoBehaviour
             foreach (var entity in _entityRegistry.AllEntities)
             {
                 if (entity == null || entity.Transform == null) continue;
+                if (entity.Transform == transform) continue; // не бежим от себя
 
                 float sqrDist = (entity.Transform.position - currentPos).sqrMagnitude;
                 if (sqrDist < minSqrDistance)
@@ -71,39 +100,17 @@ public class ChickenMovement : MonoBehaviour
         }
     }
 
-    public void Initialize(ChickenSettings settings, Transform target = null)
-    {
-        _settings = settings;
-        if (target != null)
-            _overrideTargetTransform = target;
-
-        GenerateIndividualTraits();
-        SetMovementMode(MovementMode.Walk);
-    }
-
-    /// <summary>
-    /// Генерирует уникальные физические и психологические черты особи
-    /// </summary>
     private void GenerateIndividualTraits()
     {
         if (_settings == null) return;
 
-        // 1. Персональное отклонение по расстоянию реагирования (+-5м по умолчанию)
-        _individualDistanceOffset = Random.Range(-_settings.DistanceVariance, _settings.DistanceVariance);
-
-        // 2. Индивидуальный угол отклонения при бегстве
+        _individualDistanceOffset = Random.Range(0f, _settings.DistanceVariance);
         _individualFleeAngleOffset = Random.Range(-_settings.FleeAngleVariance, _settings.FleeAngleVariance);
-
-        // 3. Персональная физическая кондиция (выносливость/скорость)
         _individualSpeedMultiplier = Random.Range(
             _settings.IndividualSpeedMultiplierRange.x,
-            _settings.IndividualSpeedMultiplierRange.y
-        );
+            _settings.IndividualSpeedMultiplierRange.y);
     }
 
-    /// <summary>
-    /// Переключает профиль скорости V(t) на основе состояния
-    /// </summary>
     public void SetMovementMode(MovementMode mode)
     {
         if (_settings == null) return;
@@ -137,35 +144,22 @@ public class ChickenMovement : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Генерирует новые случайно выбранные коэффициенты a и b для этой курицы
-    /// </summary>
     public void ApplySpeedProfile(SpeedProfileSettings profile)
     {
-        _currentA = Random.Range(profile.ARange.x, profile.ARange.y);
-        _currentB = Random.Range(profile.BRange.x, profile.BRange.y);
         _currentMaxSpeed = profile.MaxSpeed;
-        _movementTimer = 0f;
     }
 
     public void SetTarget(Transform target) => _overrideTargetTransform = target;
 
-    /// <summary>
-    /// Проверка близости с учетом персонального отклонения курицы.
-    /// </summary>
     public bool IsTargetClose(float baseDistance)
     {
         var target = TargetTransform;
         if (target == null || _settings == null) return false;
 
-        // Рассчитываем порог с персональным отклонением (защита от отрицательных значений)
         float effectiveDistance = Mathf.Max(0.2f, baseDistance + _individualDistanceOffset);
         return GetPlanarSqrDistanceTo(target) < effectiveDistance * effectiveDistance;
     }
 
-    /// <summary>
-    /// Проверка отдаления с учетом персонального отклонения курицы.
-    /// </summary>
     public bool IsTargetFarEnough(float baseDistance)
     {
         var target = TargetTransform;
@@ -176,7 +170,7 @@ public class ChickenMovement : MonoBehaviour
     }
 
     /// <summary>
-    /// Рассчитывает вектор побега с учетом индивидуального угла отклонения траектории.
+    /// Бежим от БЛИЖАЙШЕЙ угрозы. Одна угроза — одна траектория, детерминированно.
     /// </summary>
     public Vector3 GetFleeDirection()
     {
@@ -189,40 +183,59 @@ public class ChickenMovement : MonoBehaviour
         if (direction.sqrMagnitude < _settings.DirectionEpsilon)
             return -transform.forward;
 
-        // Поворачиваем вектор побега на персональный угол курицы
         direction = Quaternion.Euler(0f, _individualFleeAngleOffset, 0f) * direction.normalized;
         return direction;
     }
 
-    /// <summary>
-    /// Перемещение. Формула V(t) = (a * t + b) * IndividualMultiplier.
-    /// </summary>
     public void Move(Vector3 direction)
     {
         if (_controller == null || _settings == null) return;
 
+        if (_jumpCooldownTimer > 0f)
+            _jumpCooldownTimer -= Time.deltaTime;
+
+        UpdateVerticalVelocity();
+
         bool hasDirection = direction.sqrMagnitude >= _settings.DirectionEpsilon;
 
-        if (hasDirection)
+        if (!hasDirection)
         {
-            _movementTimer += Time.deltaTime;
-
-            // Расчет скорости с учетом времени движения и индивидуального множителя курицы
-            float rawSpeed = (_currentA * _movementTimer) + _currentB;
-            float currentSpeed = Mathf.Clamp(rawSpeed, 0f, _currentMaxSpeed) * _individualSpeedMultiplier;
-
-            Quaternion targetRotation = Quaternion.LookRotation(direction, Vector3.up);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, _settings.TurnSpeed * Time.deltaTime);
-
-            UpdateVerticalVelocity();
-            Vector3 velocity = direction.normalized * currentSpeed + Vector3.up * _verticalVelocity;
-            _controller.Move(velocity * Time.deltaTime);
-        }
-        else
-        {
-            _movementTimer = 0f;
-            UpdateVerticalVelocity();
             _controller.Move(Vector3.up * _verticalVelocity * Time.deltaTime);
+            return;
+        }
+
+        TryJump(direction);
+
+        float speed = _currentMaxSpeed
+                    * _individualSpeedMultiplier
+                    * _settings.GlobalSpeedMultiplier;
+
+        Quaternion targetRotation = Quaternion.LookRotation(direction, Vector3.up);
+        transform.rotation = Quaternion.Slerp(
+            transform.rotation,
+            targetRotation,
+            _settings.TurnSpeed * Time.deltaTime);
+
+        Vector3 velocity = direction.normalized * speed + Vector3.up * _verticalVelocity;
+        _controller.Move(velocity * Time.deltaTime);
+    }
+
+    private void TryJump(Vector3 direction)
+    {
+        if (_jumpCooldownTimer > 0f) return;
+        if (!_controller.isGrounded) return;
+        if (_verticalVelocity > 0.1f) return;
+        if (_settings.ObstacleMask.value == 0) return;
+
+        Vector3 origin = transform.position + Vector3.up * 0.5f;
+        Vector3 dir = direction.normalized;
+        dir.y = 0f;
+
+        if (Physics.Raycast(origin, dir, _settings.JumpCheckDistance,
+                            _settings.ObstacleMask, QueryTriggerInteraction.Ignore))
+        {
+            _verticalVelocity = Mathf.Sqrt(2f * Mathf.Abs(_settings.Gravity) * _settings.JumpHeight);
+            _jumpCooldownTimer = _settings.JumpCooldown;
         }
     }
 

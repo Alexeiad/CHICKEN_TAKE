@@ -4773,11 +4773,39 @@ PrefabInstance:
       objectReference: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
     - target: {fileID: 5284332621358873635, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
       propertyPath: maxSpeed
-      value: 70
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284332621358873635, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: brakeForce
+      value: 600
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284332621358873635, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: steeringSpeed
+      value: 2.09
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284332621358873635, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: maxReverseSpeed
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284332621358873635, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: engineBrakeForce
+      value: 1353
       objectReference: {fileID: 0}
     - target: {fileID: 5284332621358873635, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
       propertyPath: maxSteeringAngle
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284332621358873635, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: accelerationMultiplier
       value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284332621358873635, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: decelerationMultiplier
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284332621358873635, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: handbrakeDriftMultiplier
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 5450809871942592670, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
       propertyPath: m_Name
@@ -6828,11 +6856,39 @@ PrefabInstance:
       objectReference: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
     - target: {fileID: 5284332621358873635, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
       propertyPath: maxSpeed
-      value: 70
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284332621358873635, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: brakeForce
+      value: 600
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284332621358873635, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: steeringSpeed
+      value: 2.09
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284332621358873635, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: maxReverseSpeed
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284332621358873635, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: engineBrakeForce
+      value: 1353
       objectReference: {fileID: 0}
     - target: {fileID: 5284332621358873635, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
       propertyPath: maxSteeringAngle
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284332621358873635, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: accelerationMultiplier
       value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284332621358873635, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: decelerationMultiplier
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284332621358873635, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: handbrakeDriftMultiplier
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 5450809871942592670, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
       propertyPath: m_Name
@@ -8241,11 +8297,39 @@ PrefabInstance:
       objectReference: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
     - target: {fileID: 5284332621358873635, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
       propertyPath: maxSpeed
-      value: 70
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284332621358873635, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: brakeForce
+      value: 600
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284332621358873635, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: steeringSpeed
+      value: 2.09
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284332621358873635, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: maxReverseSpeed
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284332621358873635, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: engineBrakeForce
+      value: 1353
       objectReference: {fileID: 0}
     - target: {fileID: 5284332621358873635, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
       propertyPath: maxSteeringAngle
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284332621358873635, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: accelerationMultiplier
       value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284332621358873635, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: decelerationMultiplier
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284332621358873635, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: handbrakeDriftMultiplier
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 5450809871942592670, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
       propertyPath: m_Name
@@ -22290,6 +22374,34 @@ PrefabInstance:
     - target: {fileID: 3931816405940776121, guid: 6e56345d0ce50874da14ddd4ef276a91, type: 3}
       propertyPath: m_Enabled
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4633190295133058092, guid: 6e56345d0ce50874da14ddd4ef276a91, type: 3}
+      propertyPath: maxSpeed
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 4633190295133058092, guid: 6e56345d0ce50874da14ddd4ef276a91, type: 3}
+      propertyPath: brakeForce
+      value: 600
+      objectReference: {fileID: 0}
+    - target: {fileID: 4633190295133058092, guid: 6e56345d0ce50874da14ddd4ef276a91, type: 3}
+      propertyPath: steeringSpeed
+      value: 2.09
+      objectReference: {fileID: 0}
+    - target: {fileID: 4633190295133058092, guid: 6e56345d0ce50874da14ddd4ef276a91, type: 3}
+      propertyPath: maxReverseSpeed
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 4633190295133058092, guid: 6e56345d0ce50874da14ddd4ef276a91, type: 3}
+      propertyPath: engineBrakeForce
+      value: 1353
+      objectReference: {fileID: 0}
+    - target: {fileID: 4633190295133058092, guid: 6e56345d0ce50874da14ddd4ef276a91, type: 3}
+      propertyPath: accelerationMultiplier
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 4633190295133058092, guid: 6e56345d0ce50874da14ddd4ef276a91, type: 3}
+      propertyPath: decelerationMultiplier
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6532537228087791781, guid: 6e56345d0ce50874da14ddd4ef276a91, type: 3}
       propertyPath: _sellPoint
@@ -36743,6 +36855,7 @@ SceneRoots:
   - {fileID: 1152661290}
   - {fileID: 1771718885}
   - {fileID: 1639297323}
+  - {fileID: 1244373473}
   - {fileID: 96815882}
   - {fileID: 2021842616}
   - {fileID: 2140755781}
@@ -36752,7 +36865,6 @@ SceneRoots:
   - {fileID: 310475976}
   - {fileID: 403208560}
   - {fileID: 457820772}
-  - {fileID: 1244373473}
   - {fileID: 698028088}
   - {fileID: 102056008}
   - {fileID: 803717280}

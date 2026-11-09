@@ -259,7 +259,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7941147712754495746
 Transform:
   m_ObjectHideFlags: 0
@@ -320,14 +320,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isAi: 0
-  maxSpeed: 190
-  maxReverseSpeed: 70
-  accelerationMultiplier: 10
+  maxSpeed: 5000
+  maxReverseSpeed: 1200
+  accelerationMultiplier: 1000
   maxSteeringAngle: 20
-  steeringSpeed: 0.8
-  brakeForce: 300
-  decelerationMultiplier: 2
-  handbrakeDriftMultiplier: 8
+  steeringSpeed: 5
+  brakeForce: 600
+  decelerationMultiplier: 100
+  handbrakeDriftMultiplier: 100
   bodyMassCenter: {x: 0, y: 0, z: 0}
   frontLeftMesh: {fileID: 2563254511944741772}
   frontLeftCollider: {fileID: 3503526838149268231}
@@ -997,7 +997,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: 100
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 45e0584e9524d674cacab4663cb5ab18, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -1061,7 +1061,7 @@ MonoBehaviour:
   m_margin: {x: 7.268893, y: 0.87547994, z: 7.7374187, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
+  m_hasFontAssetChanged: 1
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!114 &2553440094840327055
@@ -2673,7 +2673,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7288530448865702075}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 042c44955e670fa419b18cfc55df8040, type: 3}
   m_Name: 

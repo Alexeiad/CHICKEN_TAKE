@@ -34,11 +34,13 @@ MonoBehaviour:
     LockMoveWhileCrouch: 1
     LandingDelay: 0.3
     LockMoveWhileLanding: 1
+    AnimKeyIdle: isIdle
     AnimKeyWalk: isWalk
     AnimKeyRun: isRun
     AnimKeyJump: isJump
     JumpStateName: Jump
   Chicken:
+    GlobalSpeedMultiplier: 1
     TurnSpeed: 8
     Gravity: -9.81
     GroundedStickyVelocity: -2
@@ -49,7 +51,7 @@ MonoBehaviour:
     WalkProfile:
       ARange: {x: 0.1, y: 0.4}
       BRange: {x: 0.8, y: 1.5}
-      MaxSpeed: 2.5
+      MaxSpeed: 10
     FleeProfile:
       ARange: {x: 1, y: 2.5}
       BRange: {x: 3, y: 4.5}
@@ -57,9 +59,18 @@ MonoBehaviour:
     SeekFoodProfile:
       ARange: {x: 0.3, y: 0.8}
       BRange: {x: 1.5, y: 2.2}
-      MaxSpeed: 4
-    FleeDistance: 15
-    CalmDistance: 20
+      MaxSpeed: 5
+    FleeDistance: 20
+    CalmDistance: 30
     EatingTimeRange: {x: 2, y: 5}
     StandingTimeRange: {x: 1.5, y: 3}
     WalkingTimeRange: {x: 3, y: 6}
+    PassThroughWallsMask:
+      serializedVersion: 2
+      m_Bits: 8
+    ObstacleMask:
+      serializedVersion: 2
+      m_Bits: 8
+    JumpCheckDistance: 1
+    JumpHeight: 3
+    JumpCooldown: 0.4

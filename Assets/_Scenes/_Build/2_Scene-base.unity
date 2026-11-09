@@ -196,22 +196,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: TRACK_PLAYER
       objectReference: {fileID: 0}
-    - target: {fileID: 1129198997422914418, guid: 6e56345d0ce50874da14ddd4ef276a91, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3931816405940776121, guid: 6e56345d0ce50874da14ddd4ef276a91, type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7013732139856052758, guid: 6e56345d0ce50874da14ddd4ef276a91, type: 3}
-      propertyPath: m_fontAsset
-      value: 
-      objectReference: {fileID: 11400000, guid: 45e0584e9524d674cacab4663cb5ab18, type: 2}
-    - target: {fileID: 7013732139856052758, guid: 6e56345d0ce50874da14ddd4ef276a91, type: 3}
-      propertyPath: m_hasFontAssetChanged
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 7941147712754495746, guid: 6e56345d0ce50874da14ddd4ef276a91, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

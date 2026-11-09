@@ -572,6 +572,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _gameSettings: {fileID: 11400000, guid: 3c1694854b700d74ca4ecfeb33643a77, type: 2}
+  _logDiagnostics: 0
 --- !u!114 &3136968700515268019
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -598,6 +599,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _audio: {fileID: 9125945110878379117}
+  _passThroughWalls:
+    serializedVersion: 2
+    m_Bits: 8
 --- !u!143 &2440932803654817330
 CharacterController:
   m_ObjectHideFlags: 0
