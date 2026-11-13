@@ -253,13 +253,14 @@ GameObject:
   - component: {fileID: 8770069748208050092}
   - component: {fileID: 5000556067309522239}
   - component: {fileID: 7138606254684208970}
+  - component: {fileID: 409511484410999448}
   m_Layer: 0
   m_Name: TRACK_PLAYER
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &7941147712754495746
 Transform:
   m_ObjectHideFlags: 0
@@ -320,14 +321,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isAi: 0
-  maxSpeed: 5000
-  maxReverseSpeed: 1200
-  accelerationMultiplier: 1000
+  maxSpeed: 50
+  maxReverseSpeed: 30
+  accelerationMultiplier: 30
   maxSteeringAngle: 20
-  steeringSpeed: 5
+  steeringSpeed: 2.09
   brakeForce: 600
-  decelerationMultiplier: 100
+  decelerationMultiplier: 1
   handbrakeDriftMultiplier: 100
+  engineBrakeForce: 1353
   bodyMassCenter: {x: 0, y: 0, z: 0}
   frontLeftMesh: {fileID: 2563254511944741772}
   frontLeftCollider: {fileID: 3503526838149268231}
@@ -436,6 +438,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd8c12ece4852214f9b17c8c8a65ef49, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &409511484410999448
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1129198997422914418}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e099f1775da3ce7428eec04f1ed56439, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unstuckKey: 114
+  cooldown: 1
+  liftHeight: 0.5
+  backwardForce: 6
+  sidewaysForce: 2
+  upwardForce: 3
 --- !u!1 &1178158704478819145
 GameObject:
   m_ObjectHideFlags: 0
@@ -998,14 +1018,14 @@ MonoBehaviour:
   m_text: 100
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 45e0584e9524d674cacab4663cb5ab18, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2341845365281777670, guid: ac43cf3bb8cf74b48a1e89511552a813, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190080
-  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+    rgba: 2172256123
+  m_fontColor: {r: 0.48071718, g: 1, b: 0.4764151, a: 0.5058824}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -2597,6 +2617,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2757224435356989279, guid: 73bc42c461d98824abd63f847c5ef710, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4540654124794062221, guid: 73bc42c461d98824abd63f847c5ef710, type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5808854914388958380, guid: 73bc42c461d98824abd63f847c5ef710, type: 3}

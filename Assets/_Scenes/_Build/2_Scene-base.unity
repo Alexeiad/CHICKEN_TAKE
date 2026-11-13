@@ -196,6 +196,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TRACK_PLAYER
       objectReference: {fileID: 0}
+    - target: {fileID: 1129198997422914418, guid: 6e56345d0ce50874da14ddd4ef276a91, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7941147712754495746, guid: 6e56345d0ce50874da14ddd4ef276a91, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -17717,13 +17721,36 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2191718300977223271, guid: 4907af6bb2e14364087af8318d2c7283, type: 3}
       insertIndex: -1
       addedObject: {fileID: 919535614}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1272934418397094032, guid: 4907af6bb2e14364087af8318d2c7283, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1465673792}
   m_SourcePrefab: {fileID: 100100000, guid: 4907af6bb2e14364087af8318d2c7283, type: 3}
 --- !u!4 &1465673790 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2191718300977223271, guid: 4907af6bb2e14364087af8318d2c7283, type: 3}
   m_PrefabInstance: {fileID: 1465673789}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1465673791 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1272934418397094032, guid: 4907af6bb2e14364087af8318d2c7283, type: 3}
+  m_PrefabInstance: {fileID: 1465673789}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1465673792
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1465673791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: baf66e309231a604389efb0d1397a7b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _targetObject: {fileID: 277603857}
+  _sceneIndex: 4
+  _distance: 10
 --- !u!1001 &1466371499
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -25344,6 +25371,6 @@ SceneRoots:
   - {fileID: 496703335291831066}
   - {fileID: 51611608}
   - {fileID: 1186590988}
-  - {fileID: 48906435}
   - {fileID: 5770354376827913986}
   - {fileID: 125003183}
+  - {fileID: 48906435}
