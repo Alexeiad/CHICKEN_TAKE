@@ -19,6 +19,8 @@ public class Player : MonoBehaviour, IEntity
 
     public Transform Transform => transform;
 
+    public string Name { get; set; }
+
     [Inject]
     private void Construct(IEntityRegistry<IEntity> registry)
     {

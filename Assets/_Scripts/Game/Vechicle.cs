@@ -8,6 +8,7 @@ public class Vechicle : MonoBehaviour, IEntity
     public Transform Transform => transform;
 
     private IEntityRegistry<IEntity> _registry;
+    public string Name { get; set; }
 
     [Inject]
     private void Construct(IEntityRegistry<IEntity> registry)

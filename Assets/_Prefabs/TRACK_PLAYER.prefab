@@ -321,7 +321,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isAi: 0
-  maxSpeed: 50
+  maxSpeed: 80
   maxReverseSpeed: 30
   accelerationMultiplier: 30
   maxSteeringAngle: 20

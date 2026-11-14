@@ -10,6 +10,8 @@ public class Chicken : MonoBehaviour, IEntity
 
     public Transform Transform => transform;
 
+    public string Name { get; set; }
+
     private void OnEnable()
     {
         _activeChickens.Add(this);
