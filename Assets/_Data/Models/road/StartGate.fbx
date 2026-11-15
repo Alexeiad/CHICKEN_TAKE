@@ -1,0 +1,120 @@
+; FBX 7.4.0 project file
+FBXHeaderExtension:  {
+	FBXHeaderVersion: 1003
+	FBXVersion: 7400
+	Creator: "RaceGates generator"
+}
+GlobalSettings:  {
+	Version: 1000
+	Properties70:  {
+		P: "UpAxis", "int", "Integer", "",1
+		P: "UpAxisSign", "int", "Integer", "",1
+		P: "FrontAxis", "int", "Integer", "",2
+		P: "FrontAxisSign", "int", "Integer", "",1
+		P: "CoordAxis", "int", "Integer", "",0
+		P: "CoordAxisSign", "int", "Integer", "",1
+		P: "UnitScaleFactor", "double", "Number", "",100
+	}
+}
+Definitions:  {
+	Version: 100
+	Count: 7
+	ObjectType: "GlobalSettings" {
+		Count: 1
+	}
+	ObjectType: "Model" {
+		Count: 1
+	}
+	ObjectType: "Geometry" {
+		Count: 1
+	}
+	ObjectType: "Material" {
+		Count: 3
+	}
+}
+Objects:  {
+	Geometry: 1000, "Geometry::StartGate", "Mesh" {
+		Properties70:  {
+		}
+		GeometryVersion: 124
+		Vertices: *288 {
+			a: -4,0,-0.3,-4,5.6,-0.3,-4,5.6,0.3,-4,0,0.3,-4.6,0,-0.3,-4.6,0,0.3,-4.6,5.6,0.3,-4.6,5.6,-0.3,-4.6,5.6,-0.3,-4.6,5.6,0.3,-4,5.6,0.3,-4,5.6,-0.3,-4.6,0,-0.3,-4,0,-0.3,-4,0,0.3,-4.6,0,0.3,-4.6,0,0.3,-4,0,0.3,-4,5.6,0.3,-4.6,5.6,0.3,-4.6,0,-0.3,-4.6,5.6,-0.3,-4,5.6,-0.3,-4,0,-0.3,4.6,0,-0.3,4.6,5.6,-0.3,4.6,5.6,0.3,4.6,0,0.3,4,0,-0.3,4,0,0.3,4,5.6,0.3,4,5.6,-0.3,4,5.6,-0.3,4,5.6,0.3,4.6,5.6,0.3,4.6,5.6,-0.3,4,0,-0.3,4.6,0,-0.3,4.6,0,0.3,4,0,0.3,4,0,0.3,4.6,0,0.3,4.6,5.6,0.3,4,5.6,0.3,4,0,-0.3,4,5.6,-0.3,4.6,5.6,-0.3,4.6,0,-0.3,4.6,4.4,-0.3,4.6,5.6,-0.3,4.6,5.6,0.3,4.6,4.4,0.3,-4.6,4.4,-0.3,-4.6,4.4,0.3,-4.6,5.6,0.3,-4.6,5.6,-0.3,-4.6,5.6,-0.3,-4.6,5.6,0.3,4.6,5.6,0.3,4.6,5.6,-0.3,-4.6,4.4,-0.3,4.6,4.4,-0.3,4.6,4.4,0.3,-4.6,4.4,0.3,-4.6,4.4,0.3,4.6,4.4,0.3,4.6,5.6,0.3,-4.6,5.6,0.3,-4.6,4.4,-0.3,-4.6,5.6,-0.3,4.6,5.6,-0.3,4.6,4.4,-0.3,4.6,0,-0.25,4.6,0.04,-0.25,4.6,0.04,0.25,4.6,0,0.25,-4.6,0,-0.25,-4.6,0,0.25,-4.6,0.04,0.25,-4.6,0.04,-0.25,-4.6,0.04,-0.25,-4.6,0.04,0.25,4.6,0.04,0.25,4.6,0.04,-0.25,-4.6,0,-0.25,4.6,0,-0.25,4.6,0,0.25,-4.6,0,0.25,-4.6,0,0.25,4.6,0,0.25,4.6,0.04,0.25,-4.6,0.04,0.25,-4.6,0,-0.25,-4.6,0.04,-0.25,4.6,0.04,-0.25,4.6,0,-0.25
+		}
+		PolygonVertexIndex: *96 {
+			a: 0,1,2,-4,4,5,6,-8,8,9,10,-12,12,13,14,-16,16,17,18,-20,20,21,22,-24,24,25,26,-28,28,29,30,-32,32,33,34,-36,36,37,38,-40,40,41,42,-44,44,45,46,-48,48,49,50,-52,52,53,54,-56,56,57,58,-60,60,61,62,-64,64,65,66,-68,68,69,70,-72,72,73,74,-76,76,77,78,-80,80,81,82,-84,84,85,86,-88,88,89,90,-92,92,93,94,-96
+		}
+		LayerElementNormal: 0 {
+			Version: 101
+			Name: ""
+			MappingInformationType: "ByPolygonVertex"
+			ReferenceInformationType: "Direct"
+			Normals: *288 {
+				a: 1,0,0,1,0,0,1,0,0,1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,0,1,0,0,1,0,0,1,0,0,1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,0,1,0,0,1,0,0,1,0,0,1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,1,0,0,1,0,0,1,0,0,1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,0,1,0,0,1,0,0,1,0,0,1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,0,1,0,0,1,0,0,1,0,0,1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,1,0,0,1,0,0,1,0,0,1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,0,1,0,0,1,0,0,1,0,0,1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,0,1,0,0,1,0,0,1,0,0,1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,1,0,0,1,0,0,1,0,0,1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,0,1,0,0,1,0,0,1,0,0,1,0,0,-1,0,0,-1,0,0,-1,0,0,-1,0,0,0,1,0,0,1,0,0,1,0,0,1,0,0,-1,0,0,-1,0,0,-1,0,0,-1
+			}
+		}
+		LayerElementMaterial: 0 {
+			Version: 101
+			Name: ""
+			MappingInformationType: "ByPolygon"
+			ReferenceInformationType: "IndexToDirect"
+			Materials: *24 {
+				a: 0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,2,2,2,2,2,2
+			}
+		}
+		Layer: 0 {
+			Version: 100
+			LayerElement:  {
+				Type: "LayerElementNormal"
+				TypedIndex: 0
+			}
+			LayerElement:  {
+				Type: "LayerElementMaterial"
+				TypedIndex: 0
+			}
+		}
+	}
+	Model: 2000, "Model::StartGate", "Mesh" {
+		Version: 232
+		Properties70:  {
+			P: "Lcl Translation", "Lcl Translation", "", "A",0,0,0
+			P: "Lcl Rotation", "Lcl Rotation", "", "A",0,0,0
+			P: "Lcl Scaling", "Lcl Scaling", "", "A",1,1,1
+		}
+		Shading: T
+		Culling: "CullingOff"
+	}
+	Material: 3000, "Material::Pillar", "" {
+		Version: 102
+		ShadingModel: "lambert"
+		MultiLayer: 0
+		Properties70:  {
+			P: "DiffuseColor", "Color", "", "A",0.25,0.25,0.28
+			P: "DiffuseFactor", "Number", "", "A",1
+		}
+	}
+	Material: 3001, "Material::Banner", "" {
+		Version: 102
+		ShadingModel: "lambert"
+		MultiLayer: 0
+		Properties70:  {
+			P: "DiffuseColor", "Color", "", "A",0.1,0.75,0.2
+			P: "DiffuseFactor", "Number", "", "A",1
+		}
+	}
+	Material: 3002, "Material::Line", "" {
+		Version: 102
+		ShadingModel: "lambert"
+		MultiLayer: 0
+		Properties70:  {
+			P: "DiffuseColor", "Color", "", "A",0.95,0.95,0.95
+			P: "DiffuseFactor", "Number", "", "A",1
+		}
+	}
+}
+Connections:  {
+	C: "OO",2000,0
+	C: "OO",1000,2000
+	C: "OO",3000,2000
+	C: "OO",3001,2000
+	C: "OO",3002,2000
+}
