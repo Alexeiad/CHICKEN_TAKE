@@ -351,6 +351,7 @@ MonoBehaviour:
       Data3: -1343154293
       Data4: -256386051
     Path: event:/sell
+  _pitchRange: {x: 0.9, y: 1.1}
 --- !u!1 &1497017933845941399
 GameObject:
   m_ObjectHideFlags: 0
@@ -1027,14 +1028,78 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isAi: 1
-  maxSpeed: 190
+  maxSpeed: 140
   maxReverseSpeed: 70
-  accelerationMultiplier: 6
+  drivenWheels: 4
   maxSteeringAngle: 20
   steeringSpeed: 0.5
   brakeForce: 300
   decelerationMultiplier: 2
   handbrakeDriftMultiplier: 10
+  engineBrakeForce: 600
+  targetAccelerationCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0.072948456
+      value: 1.006347
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 31.50557
+      value: 0.9868393
+      inSlope: -0.0011957979
+      outSlope: -0.0011957979
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.35524404
+    - serializedVersion: 3
+      time: 70.85765
+      value: 1.2175673
+      inSlope: -0.004714594
+      outSlope: -0.004714594
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.23689637
+      outWeight: 0.40020493
+    - serializedVersion: 3
+      time: 84.54185
+      value: 1.0477163
+      inSlope: -0.00612156
+      outSlope: -0.00612156
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.2366725
+    - serializedVersion: 3
+      time: 149.04797
+      value: 0.49695432
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  powerMultiplier: 2
+  useGearbox: 1
+  gearTopSpeeds:
+  - 10
+  - 30
+  - 50
+  - 80
+  - 140
+  shiftHysteresis: 3
+  shiftCooldown: 0.3
+  idleRPM: 800
+  maxRPM: 6500
   bodyMassCenter: {x: 0, y: 0, z: 0}
   frontLeftMesh: {fileID: 6302686550260795021}
   frontLeftCollider: {fileID: 5319945923153332332}
@@ -1051,6 +1116,7 @@ MonoBehaviour:
   RRWTireSkid: {fileID: 0}
   useUI: 0
   carSpeedText: {fileID: 0}
+  currentGearText: {fileID: 0}
   useSounds: 0
   carEngineSound: {fileID: 0}
   tireScreechSound: {fileID: 0}

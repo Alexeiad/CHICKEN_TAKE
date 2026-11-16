@@ -1,105 +1,141 @@
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 using Zenject;
 
 public sealed class Speedometer : MonoBehaviour
 {
-    [Header("UI")]
+    [Header("Ссылки")]
+    [SerializeField] private RectTransform _gauge;
+    [SerializeField] private RectTransform _needle;
     [SerializeField] private TMP_Text _speedText;
-    [Tooltip("Image с Image Type = Filled (Radial 360), заполняется по скорости")]
-    [SerializeField] private Image _gauge;
-    [Tooltip("Необязательно: подпись максимальной скорости на шкале")]
-    [SerializeField] private TMP_Text _maxLabel;
+    [SerializeField] private TMP_Text _gearText;
+
+    [Header("Pivot стрелки")]
+    [Range(0f, 0.5f)]
+    [SerializeField] private float _pivotY = 0f;
+
+    [Header("Углы")]
+    [SerializeField] private float _minAngle = 135f;
+    [SerializeField] private float _maxAngle = -135f;
 
     [Header("Настройки")]
-    [SerializeField] private float _maxSpeedKmh = 200f;
-    [SerializeField] private float _smoothing = 8f;
+    [SerializeField] private float _maxSpeedKmh = 180f;
+    [SerializeField] private float _smoothTime = 0.08f;
 
-    [Header("Шкала")]
-    [Tooltip("Какая доля круга занята шкалой: 0.75 = 270 градусов")]
-    [SerializeField, Range(0.1f, 1f)] private float _gaugeSweep = 0.75f;
-    [Tooltip("Цвет шкалы от медленной скорости (слева) к максимальной (справа)")]
-    [SerializeField] private Gradient _gaugeGradient = CreateDefaultGradient();
+    [Header("Передача")]
+    [Tooltip("Пороги скорости (км/ч) для переключения. Кол-во порогов = кол-во передач - 1")]
+    [SerializeField] private float[] _gearThresholds = { 20f, 50f, 90f, 130f };
 
     private const float MsToKmh = 3.6f;
-    private const float MaxStepPerFrame = 20f;
 
-    private Vechicle _vehicle;
+    private Transform _target;
+    private Rigidbody _targetRb;
     private Vector3 _lastPosition;
-    private float _speedKmh;
-    private int _shownSpeed = -1;
+    private bool _hasLastPosition;
+    private float _currentKmh;
+    private float _speedVel;
+    private int _lastShownInt = -1;
+    private int _lastShownGear = -1;
 
     [Inject]
     public void Construct(Vechicle vehicle)
     {
-        _vehicle = vehicle;
+        if (vehicle != null) SetTarget(vehicle.transform);
+    }
+
+    private void Awake()
+    {
+        if (_needle != null)
+            _needle.pivot = new Vector2(0.5f, _pivotY);
+
+        SetNeedleAngle(_minAngle);
     }
 
     private void Start()
     {
-        _lastPosition = _vehicle.transform.position;
-
-        if (_maxLabel != null)
-            _maxLabel.text = Mathf.RoundToInt(_maxSpeedKmh).ToString();
-
-        Render();
+        if (_target == null)
+        {
+            Vechicle found = FindObjectOfType<Vechicle>();
+            if (found != null) SetTarget(found.transform);
+        }
     }
 
-    private void Update()
+    public void SetTarget(Transform target)
     {
+        _target = target;
+        _targetRb = target != null ? target.GetComponentInParent<Rigidbody>() : null;
+        _hasLastPosition = false;
+    }
+
+    private void LateUpdate()
+    {
+        if (_needle != null && _gauge != null)
+            _needle.position = _gauge.position;
+
         float dt = Time.deltaTime;
         if (dt <= 0f) return;
 
-        UpdateSpeed(dt);
-        Render();
-    }
+        float rawKmh = ReadSpeedKmh(dt);
+        _currentKmh = Mathf.SmoothDamp(_currentKmh, rawKmh, ref _speedVel, _smoothTime);
 
-    private void UpdateSpeed(float dt)
-    {
-        Vector3 position = _vehicle.transform.position;
-        float step = Vector3.Distance(position, _lastPosition);
-        _lastPosition = position;
+        float t = Mathf.Clamp01(_currentKmh / Mathf.Max(1f, _maxSpeedKmh));
+        SetNeedleAngle(Mathf.Lerp(_minAngle, _maxAngle, t));
 
-        // Телепорт или респавн в скорость не идут.
-        if (step > MaxStepPerFrame) return;
-
-        float rawKmh = step / dt * MsToKmh;
-        _speedKmh = Mathf.Lerp(_speedKmh, rawKmh, 1f - Mathf.Exp(-_smoothing * dt));
-    }
-
-    private void Render()
-    {
-        int speed = Mathf.RoundToInt(_speedKmh);
-
-        if (speed != _shownSpeed)
+        if (_speedText != null)
         {
-            _shownSpeed = speed;
-            _speedText.text = speed.ToString();
+            int shown = Mathf.RoundToInt(_currentKmh);
+            if (shown != _lastShownInt)
+            {
+                _lastShownInt = shown;
+                _speedText.text = shown.ToString();
+            }
         }
 
-        if (_gauge == null) return;
-
-        float normalized = Mathf.Clamp01(_speedKmh / _maxSpeedKmh);
-        _gauge.fillAmount = normalized * _gaugeSweep;
-        _gauge.color = _gaugeGradient.Evaluate(normalized);
+        if (_gearText != null)
+        {
+            int gear = GetGear(_currentKmh);
+            if (gear != _lastShownGear)
+            {
+                _lastShownGear = gear;
+                _gearText.text = gear.ToString();
+            }
+        }
     }
 
-    private static Gradient CreateDefaultGradient()
+    // 1 передача = 0 км/ч, 2 = выше первого порога, и т.д.
+    private int GetGear(float kmh)
     {
-        Gradient gradient = new Gradient();
-        gradient.SetKeys(
-            new[]
-            {
-                new GradientColorKey(new Color(0.20f, 0.90f, 0.40f), 0f),
-                new GradientColorKey(new Color(1.00f, 0.85f, 0.20f), 0.6f),
-                new GradientColorKey(new Color(1.00f, 0.25f, 0.25f), 1f),
-            },
-            new[]
-            {
-                new GradientAlphaKey(1f, 0f),
-                new GradientAlphaKey(1f, 1f),
-            });
-        return gradient;
+        int gear = 1;
+        for (int i = 0; i < _gearThresholds.Length; i++)
+            if (kmh >= _gearThresholds[i]) gear = i + 2;
+        return gear;
+    }
+
+    private void SetNeedleAngle(float angle)
+    {
+        if (_needle != null)
+            _needle.localRotation = Quaternion.Euler(0f, 0f, angle);
+    }
+
+    private float ReadSpeedKmh(float dt)
+    {
+        if (_target == null) return 0f;
+
+        if (_targetRb != null && !_targetRb.isKinematic)
+            return _targetRb.velocity.magnitude * MsToKmh;
+
+        Vector3 pos = _target.position;
+        if (!_hasLastPosition)
+        {
+            _lastPosition = pos;
+            _hasLastPosition = true;
+            return 0f;
+        }
+
+        float dist = Vector3.Distance(pos, _lastPosition);
+        _lastPosition = pos;
+
+        if (dist > 25f) return _currentKmh;
+        return (dist / dt) * MsToKmh;
     }
 }

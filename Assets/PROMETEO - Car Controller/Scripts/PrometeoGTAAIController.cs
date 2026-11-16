@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+п»їusing System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Splines;
@@ -13,9 +13,9 @@ public enum DrivingLane
 
 public enum AIPersonality
 {
-    Bully,      // Задира: разгоняется со старта, выжидает, бьет в бок и скидывает соперника за 15м
-    Cautious,   // Опасающийся: разгоняется со всеми, но держится аккуратно
-    Strategist, // Стратег: умный выбор полос и чистая траектория
+    Bully,      // Р—Р°РґРёСЂР°: СЂР°Р·РіРѕРЅСЏРµС‚СЃСЏ СЃРѕ СЃС‚Р°СЂС‚Р°, РІС‹Р¶РёРґР°РµС‚, Р±СЊРµС‚ РІ Р±РѕРє Рё СЃРєРёРґС‹РІР°РµС‚ СЃРѕРїРµСЂРЅРёРєР° Р·Р° 15Рј
+    Cautious,   // РћРїР°СЃР°СЋС‰РёР№СЃСЏ: СЂР°Р·РіРѕРЅСЏРµС‚СЃСЏ СЃРѕ РІСЃРµРјРё, РЅРѕ РґРµСЂР¶РёС‚СЃСЏ Р°РєРєСѓСЂР°С‚РЅРѕ
+    Strategist, // РЎС‚СЂР°С‚РµРі: СѓРјРЅС‹Р№ РІС‹Р±РѕСЂ РїРѕР»РѕСЃ Рё С‡РёСЃС‚Р°СЏ С‚СЂР°РµРєС‚РѕСЂРёСЏ
     Random
 }
 
@@ -27,7 +27,7 @@ public class PrometeoGTAAIController : MonoBehaviour
     [Header("Spline Setup & Boundaries")]
     [SerializeField] private SplineContainer splineContainer;
     [SerializeField] private float laneOffsetDistance = 5f;
-    [Tooltip("Максимальная граница трассы (15м). Задира и ИИ не пересекают её при маневрах.")]
+    [Tooltip("РњР°РєСЃРёРјР°Р»СЊРЅР°СЏ РіСЂР°РЅРёС†Р° С‚СЂР°СЃСЃС‹ (15Рј). Р—Р°РґРёСЂР° Рё РР РЅРµ РїРµСЂРµСЃРµРєР°СЋС‚ РµС‘ РїСЂРё РјР°РЅРµРІСЂР°С….")]
     [SerializeField] private float maxRoadBoundary = 15f;
 
     [Header("AI Personality")]
@@ -52,7 +52,7 @@ public class PrometeoGTAAIController : MonoBehaviour
     [SerializeField] private float speedLookAheadFactor = 0.15f;
     [SerializeField] private float cornerCheckDistance = 40f;
 
-    [Header("Bully Tactics (Задира)")]
+    [Header("Bully Tactics (Р—Р°РґРёСЂР°)")]
     [SerializeField] private float bullySearchRadius = 30f;
     private bool isBullyHunting = false;
     private Transform bullyTarget = null;
@@ -62,15 +62,15 @@ public class PrometeoGTAAIController : MonoBehaviour
     [SerializeField] private float predictionFactor = 0.15f;
     [SerializeField] private float steerDeadzone = 1.5f;
 
-    // Таймер старта (чтобы со старта они сначала разогнались)
+    // РўР°Р№РјРµСЂ СЃС‚Р°СЂС‚Р° (С‡С‚РѕР±С‹ СЃРѕ СЃС‚Р°СЂС‚Р° РѕРЅРё СЃРЅР°С‡Р°Р»Р° СЂР°Р·РѕРіРЅР°Р»РёСЃСЊ)
     private float startAccelerationTimer = 3.0f;
 
-    // Компоненты
+    // РљРѕРјРїРѕРЅРµРЅС‚С‹
     private NavMeshAgent agent;
     private PrometeoCarController carController;
     private Rigidbody rb;
 
-    // Внутренние переменные
+    // Р’РЅСѓС‚СЂРµРЅРЅРёРµ РїРµСЂРµРјРµРЅРЅС‹Рµ
     private float normalizedSplineTime = 0f;
     private float decisionTimer = 0f;
     private float targetSpeedForCorner = 120f;
@@ -129,7 +129,7 @@ public class PrometeoGTAAIController : MonoBehaviour
     {
         if (splineContainer == null || splineContainer.Splines.Count == 0) return;
 
-        // Отсчет стартового разгона (первые 3 секунды никому не мешаем, набираем скорость)
+        // РћС‚СЃС‡РµС‚ СЃС‚Р°СЂС‚РѕРІРѕРіРѕ СЂР°Р·РіРѕРЅР° (РїРµСЂРІС‹Рµ 3 СЃРµРєСѓРЅРґС‹ РЅРёРєРѕРјСѓ РЅРµ РјРµС€Р°РµРј, РЅР°Р±РёСЂР°РµРј СЃРєРѕСЂРѕСЃС‚СЊ)
         if (startAccelerationTimer > 0f)
         {
             startAccelerationTimer -= Time.deltaTime;
@@ -147,7 +147,7 @@ public class PrometeoGTAAIController : MonoBehaviour
         if (bullyCooldown > 0f) bullyCooldown -= Time.deltaTime;
         if (laneDecisionCooldown > 0f) laneDecisionCooldown -= Time.deltaTime;
 
-        // Отмена тарана задиры при подходе к опасной границе
+        // РћС‚РјРµРЅР° С‚Р°СЂР°РЅР° Р·Р°РґРёСЂС‹ РїСЂРё РїРѕРґС…РѕРґРµ Рє РѕРїР°СЃРЅРѕР№ РіСЂР°РЅРёС†Рµ
         if (isBullyHunting)
         {
             float myOffset = GetCurrentDistanceFromCenter();
@@ -173,7 +173,7 @@ public class PrometeoGTAAIController : MonoBehaviour
         float currentSpeed = Mathf.Abs(carController.carSpeed);
         targetSpeedForCorner = EvaluateCorneringSpeed();
 
-        // В самом начале гонки (первые 3 секунды) — газ в пол без ограничений для быстрого старта!
+        // Р’ СЃР°РјРѕРј РЅР°С‡Р°Р»Рµ РіРѕРЅРєРё (РїРµСЂРІС‹Рµ 3 СЃРµРєСѓРЅРґС‹) вЂ” РіР°Р· РІ РїРѕР» Р±РµР· РѕРіСЂР°РЅРёС‡РµРЅРёР№ РґР»СЏ Р±С‹СЃС‚СЂРѕРіРѕ СЃС‚Р°СЂС‚Р°!
         if (startAccelerationTimer > 0f)
         {
             carController.CancelInvoke("DecelerateCar");
@@ -261,7 +261,7 @@ public class PrometeoGTAAIController : MonoBehaviour
         Vector3 localPos = splineContainer.transform.InverseTransformPoint(transform.position);
         SplineUtility.GetNearestPoint(spline, localPos, out _, out normalizedSplineTime);
 
-        // АВАРИЙНЫЙ ВОЗВРАТ: Если тачку вынесло за 15 метров
+        // РђР’РђР РР™РќР«Р™ Р’РћР—Р’Р РђРў: Р•СЃР»Рё С‚Р°С‡РєСѓ РІС‹РЅРµСЃР»Рѕ Р·Р° 15 РјРµС‚СЂРѕРІ
         if (GetCurrentDistanceFromCenter() > maxRoadBoundary)
         {
             isBullyHunting = false;
@@ -277,7 +277,7 @@ public class PrometeoGTAAIController : MonoBehaviour
         DrivingLane activeLane = isLaneChanging ? (laneChangeProgress < 0.5f ? currentLane : targetLane) : currentLane;
         Vector3 worldTargetPos = GetEvaluatedPositionWithLaneOffset(targetNormalizedTime, activeLane);
 
-        // Преследование задиры (включается только после окончания стартового разгона)
+        // РџСЂРµСЃР»РµРґРѕРІР°РЅРёРµ Р·Р°РґРёСЂС‹ (РІРєР»СЋС‡Р°РµС‚СЃСЏ С‚РѕР»СЊРєРѕ РїРѕСЃР»Рµ РѕРєРѕРЅС‡Р°РЅРёСЏ СЃС‚Р°СЂС‚РѕРІРѕРіРѕ СЂР°Р·РіРѕРЅР°)
         if (isBullyHunting && bullyTarget != null && startAccelerationTimer <= 0f)
         {
             worldTargetPos = bullyTarget.position;
@@ -296,7 +296,7 @@ public class PrometeoGTAAIController : MonoBehaviour
     {
         if (isLaneChanging || laneDecisionCooldown > 0f) return;
 
-        // 1. Поведение ЗАДИРЫ: ищет жертву для выталкивания
+        // 1. РџРѕРІРµРґРµРЅРёРµ Р—РђР”РР Р«: РёС‰РµС‚ Р¶РµСЂС‚РІСѓ РґР»СЏ РІС‹С‚Р°Р»РєРёРІР°РЅРёСЏ
         if (personality == AIPersonality.Bully && !isBullyHunting && bullyCooldown <= 0f)
         {
             Collider[] hits = Physics.OverlapSphere(transform.position, bullySearchRadius);
@@ -322,7 +322,7 @@ public class PrometeoGTAAIController : MonoBehaviour
             }
         }
 
-        // 2. Умный выбор полосы при препятствии впереди
+        // 2. РЈРјРЅС‹Р№ РІС‹Р±РѕСЂ РїРѕР»РѕСЃС‹ РїСЂРё РїСЂРµРїСЏС‚СЃС‚РІРёРё РІРїРµСЂРµРґРё
         if (Physics.SphereCast(transform.position + Vector3.up * 0.5f, 1.8f, transform.forward, out RaycastHit hitInfo, 22f))
         {
             var otherAI = hitInfo.collider.GetComponentInParent<PrometeoGTAAIController>();
