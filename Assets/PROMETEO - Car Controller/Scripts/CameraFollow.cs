@@ -19,17 +19,21 @@ public class CameraFollow : MonoBehaviour {
 		absoluteInitCameraPosition = initialCameraPosition - initialCarPosition;
 	}
 
-	void FixedUpdate()
-	{
-		//Look at car
-		Vector3 _lookDirection = (new Vector3(carTransform.position.x, carTransform.position.y, carTransform.position.z)) - transform.position;
-		Quaternion _rot = Quaternion.LookRotation(_lookDirection, Vector3.up);
-		transform.rotation = Quaternion.Lerp(transform.rotation, _rot, lookSpeed * Time.deltaTime);
+    void FixedUpdate()
+    {
+        if (GameState.IsPaused) return;
 
-		//Move to car
-		Vector3 _targetPos = absoluteInitCameraPosition + carTransform.transform.position;
-		transform.position = Vector3.Lerp(transform.position, _targetPos, followSpeed * Time.deltaTime);
+        //Look at car
+        Vector3 _lookDirection = carTransform.position - transform.position;
+        if (_lookDirection.sqrMagnitude > 0.0001f)
+        {
+            Quaternion _rot = Quaternion.LookRotation(_lookDirection, Vector3.up);
+            transform.rotation = Quaternion.Lerp(transform.rotation, _rot, lookSpeed * Time.deltaTime);
+        }
 
-	}
+        //Move to car
+        Vector3 _targetPos = absoluteInitCameraPosition + carTransform.position;
+        transform.position = Vector3.Lerp(transform.position, _targetPos, followSpeed * Time.deltaTime);
+    }
 
 }

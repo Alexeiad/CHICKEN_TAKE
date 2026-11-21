@@ -4,6 +4,8 @@ using Zenject;
 
 public sealed class Speedometer : MonoBehaviour
 {
+    public const int ReverseGearCode = -1;
+
     [Header("Ссылки")]
     [SerializeField] private RectTransform _gauge;
     [SerializeField] private RectTransform _needle;
@@ -21,6 +23,8 @@ public sealed class Speedometer : MonoBehaviour
     [Header("Настройки")]
     [SerializeField] private float _maxSpeedKmh = 180f;
     [SerializeField] private float _smoothTime = 0.08f;
+    [Tooltip("Порог скорости (км/ч), ниже которого движение назад не считается R при околонулевом дрейфе")]
+    [SerializeField] private float _reverseThresholdKmh = 0.5f;
 
     [Header("Передача")]
     [Tooltip("Пороги скорости (км/ч) для переключения. Кол-во порогов = кол-во передач - 1")]
@@ -30,12 +34,13 @@ public sealed class Speedometer : MonoBehaviour
 
     private Transform _target;
     private Rigidbody _targetRb;
+    private PrometeoCarController _carController;
     private Vector3 _lastPosition;
     private bool _hasLastPosition;
-    private float _currentKmh;
+    private float _signedKmh;
     private float _speedVel;
-    private int _lastShownInt = -1;
-    private int _lastShownGear = -1;
+    private string _lastShownSpeed = string.Empty;
+    private int _lastShownGear = int.MinValue;
 
     [Inject]
     public void Construct(Vechicle vehicle)
@@ -63,7 +68,16 @@ public sealed class Speedometer : MonoBehaviour
     public void SetTarget(Transform target)
     {
         _target = target;
-        _targetRb = target != null ? target.GetComponentInParent<Rigidbody>() : null;
+        if (target != null)
+        {
+            _targetRb = target.GetComponentInParent<Rigidbody>();
+            _carController = target.GetComponentInParent<PrometeoCarController>();
+        }
+        else
+        {
+            _targetRb = null;
+            _carController = null;
+        }
         _hasLastPosition = false;
     }
 
@@ -75,40 +89,53 @@ public sealed class Speedometer : MonoBehaviour
         float dt = Time.deltaTime;
         if (dt <= 0f) return;
 
-        float rawKmh = ReadSpeedKmh(dt);
-        _currentKmh = Mathf.SmoothDamp(_currentKmh, rawKmh, ref _speedVel, _smoothTime);
+        float rawSignedKmh = ReadSignedSpeedKmh(dt);
+        _signedKmh = Mathf.SmoothDamp(_signedKmh, rawSignedKmh, ref _speedVel, _smoothTime);
 
-        float t = Mathf.Clamp01(_currentKmh / Mathf.Max(1f, _maxSpeedKmh));
+        float absKmh = Mathf.Abs(_signedKmh);
+        float t = Mathf.Clamp01(absKmh / Mathf.Max(1f, _maxSpeedKmh));
         SetNeedleAngle(Mathf.Lerp(_minAngle, _maxAngle, t));
 
         if (_speedText != null)
         {
-            int shown = Mathf.RoundToInt(_currentKmh);
-            if (shown != _lastShownInt)
+            string shown = Mathf.RoundToInt(absKmh).ToString();
+            if (shown != _lastShownSpeed)
             {
-                _lastShownInt = shown;
-                _speedText.text = shown.ToString();
+                _lastShownSpeed = shown;
+                _speedText.text = shown;
             }
         }
 
         if (_gearText != null)
         {
-            int gear = GetGear(_currentKmh);
+            int gear = GetGear(_signedKmh);
             if (gear != _lastShownGear)
             {
                 _lastShownGear = gear;
-                _gearText.text = gear.ToString();
+                _gearText.text = FormatGear(gear);
             }
         }
     }
 
-    // 1 передача = 0 км/ч, 2 = выше первого порога, и т.д.
-    private int GetGear(float kmh)
+    // -1 = R (задний ход), 1 = 1 передача (0 км/ч), 2+ = выше порогов
+    private int GetGear(float signedKmh)
     {
+        if (_carController != null && _carController.carSpeed < -_reverseThresholdKmh)
+            return ReverseGearCode;
+
+        if (signedKmh < -_reverseThresholdKmh)
+            return ReverseGearCode;
+
+        float forwardKmh = Mathf.Max(0f, signedKmh);
         int gear = 1;
         for (int i = 0; i < _gearThresholds.Length; i++)
-            if (kmh >= _gearThresholds[i]) gear = i + 2;
+            if (forwardKmh >= _gearThresholds[i]) gear = i + 2;
         return gear;
+    }
+
+    private static string FormatGear(int gear)
+    {
+        return gear == ReverseGearCode ? "R" : gear.ToString();
     }
 
     private void SetNeedleAngle(float angle)
@@ -117,12 +144,18 @@ public sealed class Speedometer : MonoBehaviour
             _needle.localRotation = Quaternion.Euler(0f, 0f, angle);
     }
 
-    private float ReadSpeedKmh(float dt)
+    private float ReadSignedSpeedKmh(float dt)
     {
         if (_target == null) return 0f;
 
+        if (_carController != null)
+            return _carController.carSpeed;
+
         if (_targetRb != null && !_targetRb.isKinematic)
-            return _targetRb.velocity.magnitude * MsToKmh;
+        {
+            float signedMs = Vector3.Dot(_targetRb.velocity, _target.forward);
+            return signedMs * MsToKmh;
+        }
 
         Vector3 pos = _target.position;
         if (!_hasLastPosition)
@@ -132,10 +165,13 @@ public sealed class Speedometer : MonoBehaviour
             return 0f;
         }
 
-        float dist = Vector3.Distance(pos, _lastPosition);
+        Vector3 delta = pos - _lastPosition;
         _lastPosition = pos;
 
-        if (dist > 25f) return _currentKmh;
-        return (dist / dt) * MsToKmh;
+        float dist = delta.magnitude;
+        if (dist > 25f) return _signedKmh;
+
+        float signedDist = Vector3.Dot(delta, _target.forward);
+        return (signedDist / dt) * MsToKmh;
     }
 }

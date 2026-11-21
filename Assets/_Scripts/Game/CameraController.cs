@@ -14,6 +14,7 @@ public class CameraController : MonoBehaviour
 
     // текущие значения, которые плавно едут к целевым
     private bool _initialized;
+    private bool _targetAcquired;
     private Vector3 _currentOffset;
     private Vector2 _currentLimits;
     private float _currentDistance;
@@ -33,11 +34,124 @@ public class CameraController : MonoBehaviour
         _settings = settings;
     }
 
+    private void Awake()
+    {
+        TryAcquireTarget();
+    }
+
+    private void OnEnable()
+    {
+        if (_targetAcquired)
+            SubscribeGameState();
+    }
+
+    private void OnDisable()
+    {
+        UnsubscribeGameState();
+    }
+
     private void LateUpdate()
     {
-        if (InformationPointUI.BlocksGameplayInput) return;
+        if (!_targetAcquired)
+        {
+            TryAcquireTarget();
+            if (!_targetAcquired)
+                return;
+
+            SubscribeGameState();
+        }
+
+        if (GameState.IsPaused || InformationPointUI.BlocksGameplayInput)
+            return;
+
         Rotation();
         View();
+    }
+
+    private void SubscribeGameState()
+    {
+        GameState.PauseChanged -= OnPauseChanged;
+        GameState.PauseChanged += OnPauseChanged;
+        ApplyPauseCursorState(GameState.IsPaused);
+    }
+
+    private void UnsubscribeGameState()
+    {
+        GameState.PauseChanged -= OnPauseChanged;
+    }
+
+    private bool TryAcquireTarget()
+    {
+        if (_targetAcquired)
+            return true;
+
+        if (_playerRegistry == null || _settings == null)
+            return false;
+
+        Player player = _playerRegistry.AllEntities
+            .OfType<Player>()
+            .FirstOrDefault(x => x != null && x.gameObject.activeInHierarchy);
+
+        if (player == null)
+            return false;
+
+        bool inVehicle = PlayerFootstepAudio.isOnSeat;
+
+        Vector3 targetOffset = inVehicle ? _settings.Vehicle.TargetOffset : _settings.TargetOffset;
+        Vector2 targetLimits = inVehicle ? _settings.Vehicle.VerticalLimits : _settings.VerticalLimits;
+        float targetDistance = inVehicle ? _settings.Vehicle.Distance : _settings.Distance;
+
+        _currentOffset = targetOffset;
+        _currentLimits = targetLimits;
+        _currentDistance = targetDistance;
+        _initialized = true;
+
+        Vector3 forward = GetFlatForward(player, inVehicle);
+        _yaw = Mathf.Atan2(forward.x, forward.z) * Mathf.Rad2Deg;
+        _pitch = Mathf.Clamp(_pitch, _currentLimits.x, _currentLimits.y);
+
+        Vector3 center = player.transform.position + _currentOffset;
+        Quaternion rotation = Quaternion.Euler(_pitch, _yaw, 0f);
+
+        transform.position = center + rotation * new Vector3(0f, 0f, -_currentDistance);
+        transform.LookAt(center);
+
+        _targetAcquired = true;
+        return true;
+    }
+
+    private static Vector3 GetFlatForward(Player player, bool inVehicle)
+    {
+        Transform source = player.transform;
+        if (inVehicle && source.parent != null)
+            source = source.parent;
+
+        Vector3 flatForward = Vector3.ProjectOnPlane(source.forward, Vector3.up);
+        if (flatForward.sqrMagnitude < 0.0001f)
+            flatForward = Vector3.ProjectOnPlane(player.transform.forward, Vector3.up);
+
+        if (flatForward.sqrMagnitude < 0.0001f)
+            flatForward = Vector3.forward;
+
+        return flatForward.normalized;
+    }
+
+    private void OnPauseChanged(bool paused)
+    {
+        ApplyPauseCursorState(paused);
+
+        if (paused)
+            _distanceTween?.Pause();
+        else
+            _distanceTween?.Play();
+    }
+
+    private static void ApplyPauseCursorState(bool paused)
+    {
+        if (!paused) return;
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     private void Rotation()
@@ -117,6 +231,7 @@ public class CameraController : MonoBehaviour
 
     private void OnDestroy()
     {
+        UnsubscribeGameState();
         _distanceTween?.Kill();
     }
 }

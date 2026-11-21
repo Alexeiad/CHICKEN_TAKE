@@ -956,6 +956,7 @@ GameObject:
   - component: {fileID: 421085415375222408}
   - component: {fileID: 5284332621358873635}
   - component: {fileID: 4143543560714264228}
+  - component: {fileID: 647743550946930542}
   - component: {fileID: 6615251593952713912}
   - component: {fileID: 3025444071328805132}
   - component: {fileID: 9003950505931673963}
@@ -1027,80 +1028,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0fefceefe666bb4682b272ec8c5bdd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _settings: {fileID: 11400000, guid: 82a203c75abc9624dacbe12152d113a9, type: 2}
   isAi: 1
-  maxSpeed: 140
-  maxReverseSpeed: 70
-  drivenWheels: 4
-  maxSteeringAngle: 20
-  steeringSpeed: 0.5
-  brakeForce: 300
-  decelerationMultiplier: 2
-  handbrakeDriftMultiplier: 10
-  engineBrakeForce: 600
-  targetAccelerationCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0.072948456
-      value: 1.006347
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 31.50557
-      value: 0.9868393
-      inSlope: -0.0011957979
-      outSlope: -0.0011957979
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.35524404
-    - serializedVersion: 3
-      time: 70.85765
-      value: 1.2175673
-      inSlope: -0.004714594
-      outSlope: -0.004714594
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.23689637
-      outWeight: 0.40020493
-    - serializedVersion: 3
-      time: 84.54185
-      value: 1.0477163
-      inSlope: -0.00612156
-      outSlope: -0.00612156
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.2366725
-    - serializedVersion: 3
-      time: 149.04797
-      value: 0.49695432
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  powerMultiplier: 2
-  useGearbox: 1
-  gearTopSpeeds:
-  - 10
-  - 30
-  - 50
-  - 80
-  - 140
-  shiftHysteresis: 3
-  shiftCooldown: 0.3
-  idleRPM: 800
-  maxRPM: 6500
-  bodyMassCenter: {x: 0, y: 0, z: 0}
   frontLeftMesh: {fileID: 6302686550260795021}
   frontLeftCollider: {fileID: 5319945923153332332}
   frontRightMesh: {fileID: 4676506548772268497}
@@ -1109,18 +1038,14 @@ MonoBehaviour:
   rearLeftCollider: {fileID: 5523343227969311761}
   rearRightMesh: {fileID: 6559576400846850690}
   rearRightCollider: {fileID: 5764117324832080705}
-  useEffects: 1
   RLWParticleSystem: {fileID: 2742499233748705444}
   RRWParticleSystem: {fileID: 4193934292951555287}
   RLWTireSkid: {fileID: 0}
   RRWTireSkid: {fileID: 0}
-  useUI: 0
   carSpeedText: {fileID: 0}
   currentGearText: {fileID: 0}
-  useSounds: 0
   carEngineSound: {fileID: 0}
   tireScreechSound: {fileID: 0}
-  useTouchControls: 0
   throttleButton: {fileID: 0}
   reverseButton: {fileID: 0}
   turnRightButton: {fileID: 0}
@@ -1151,7 +1076,7 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &6615251593952713912
+--- !u!114 &647743550946930542
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1160,33 +1085,49 @@ MonoBehaviour:
   m_GameObject: {fileID: 5450809871942592670}
   m_Enabled: 1
   m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79aae047d4f8f0d4aa9cd9f1dd6def9d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _settings: {fileID: 11400000, guid: 82a203c75abc9624dacbe12152d113a9, type: 2}
+  _splineContainer: {fileID: 0}
+  _personality: 0
+  _currentLane: -1
+--- !u!114 &6615251593952713912
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5450809871942592670}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c4c0ebb227b2e14439900c707bf7993e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  splineContainer: {fileID: 0}
+  _splineContainer: {fileID: 0}
   splineIndex: 2
-  snapToSplineOnStart: 1
-  maxSpeed: 100
-  physicalBrakePower: 15
-  baseLookAhead: 20
-  speedLookAheadFactor: 0.18
-  predictionFactor: 0.18
-  steerDeadzone: 0.1
-  minDecisionInterval: 0.4
-  maxDecisionInterval: 1
+  _snapToSplineOnStart: 1
+  _maxSpeed: 100
+  _physicalBrakePower: 15
+  _baseLookAhead: 20
+  _speedLookAheadFactor: 0.18
+  _predictionFactor: 0.18
+  _steerDeadzone: 0.1
+  _minDecisionInterval: 0.4
+  _maxDecisionInterval: 1
   laneChangeProbability: 70
-  frontDetectionRange: 5
-  aggressiveSpeedMultiplier: 1.2
-  allowedLaneChangeSplines: 000000000100000002000000
-  yieldSpeedMultiplier: 0.7
-  yieldCheckDistance: 12
-  minLaneChangeCooldown: 1.5
-  maxLaneChangeCooldown: 4
-  trackWaypoints:
+  _frontDetectionRange: 5
+  _aggressiveSpeedMultiplier: 1.2
+  _allowedLaneChangeSplines: 000000000100000002000000
+  _yieldSpeedMultiplier: 0.7
+  _yieldCheckDistance: 12
+  _minLaneChangeCooldown: 1.5
+  _maxLaneChangeCooldown: 4
+  _trackWaypoints:
   - {fileID: 0}
-  stuckSpeedThreshold: 0.1
-  stuckTime: 1
-  stuckTurnAngle: 45
+  _stuckSpeedThreshold: 0.1
+  _stuckTime: 1
+  _stuckTurnAngle: 45
 --- !u!95 &3025444071328805132
 Animator:
   serializedVersion: 5

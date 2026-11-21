@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Serialization;
 using UnityEngine.Splines;
 using Unity.Mathematics;
 
@@ -24,102 +24,110 @@ public enum AIPersonality
 [RequireComponent(typeof(Rigidbody))]
 public class PrometeoGTAAIController : MonoBehaviour
 {
-    [Header("Spline Setup & Boundaries")]
-    [SerializeField] private SplineContainer splineContainer;
-    [SerializeField] private float laneOffsetDistance = 5f;
-    [Tooltip("Максимальная граница трассы (15м). Задира и ИИ не пересекают её при маневрах.")]
-    [SerializeField] private float maxRoadBoundary = 15f;
+    [Header("Settings")]
+    [Tooltip("Все числовые настройки ИИ берутся из этого ассета (Bot → AI). Без него используются значения по умолчанию.")]
+    [SerializeField] private VehiclesSettings _settings;
+
+    [Header("Spline")]
+    [FormerlySerializedAs("splineContainer")]
+    [SerializeField] private SplineContainer _splineContainer;
 
     [Header("AI Personality")]
-    [SerializeField] private AIPersonality personality = AIPersonality.Strategist;
+    [FormerlySerializedAs("personality")]
+    [SerializeField] private AIPersonality _personality = AIPersonality.Strategist;
 
     [Header("Current Lane")]
-    [SerializeField] private DrivingLane currentLane = DrivingLane.Center;
-    private DrivingLane targetLane;
-    private bool isLaneChanging = false;
-    private float laneChangeProgress = 0f;
-    private float laneChangeSpeed = 5f;
-    private float laneDecisionCooldown = 0f;
+    [FormerlySerializedAs("currentLane")]
+    [SerializeField] private DrivingLane _currentLane = DrivingLane.Center;
 
-    [Header("Speed & Physics")]
-    [SerializeField] private float baseMaxSpeed = 120f;
-    [SerializeField] private float physicalBrakePower = 45f;
-    private float nitroMultiplier = 1.45f;
-    private bool isUsingNitro = false;
+    // Рабочие настройки (из ассета или значения по умолчанию)
+    private BotAISettings _ai;
+    private PersonalitySettings _tuning;
 
-    [Header("Cornering & Grip")]
-    [SerializeField] private float baseLookAhead = 22f;
-    [SerializeField] private float speedLookAheadFactor = 0.15f;
-    [SerializeField] private float cornerCheckDistance = 40f;
+    private DrivingLane _targetLane;
+    private bool _isLaneChanging = false;
+    private float _laneChangeProgress = 0f;
+    private float _laneDecisionCooldown = 0f;
 
-    [Header("Bully Tactics (Задира)")]
-    [SerializeField] private float bullySearchRadius = 30f;
-    private bool isBullyHunting = false;
-    private Transform bullyTarget = null;
-    private float bullyCooldown = 0f;
+    private bool _isUsingNitro = false;
 
-    [Header("Steering")]
-    [SerializeField] private float predictionFactor = 0.15f;
-    [SerializeField] private float steerDeadzone = 1.5f;
+    private bool _isBullyHunting = false;
+    private Transform _bullyTarget = null;
+    private float _bullyCooldown = 0f;
+
+    private bool _crashAirborne = false;
+    private float _crashTimer = 0f;
+    private float _crashCooldownTimer = 0f;
+    private float _flipTimer = 0f;
 
     // Таймер старта (чтобы со старта они сначала разогнались)
-    private float startAccelerationTimer = 3.0f;
+    private float _startAccelerationTimer = 3.0f;
 
     // Компоненты
-    private NavMeshAgent agent;
-    private PrometeoCarController carController;
-    private Rigidbody rb;
+    private NavMeshAgent _agent;
+    private PrometeoCarController _carController;
+    private Rigidbody _rb;
 
     // Внутренние переменные
-    private float normalizedSplineTime = 0f;
-    private float decisionTimer = 0f;
-    private float targetSpeedForCorner = 120f;
+    private float _normalizedSplineTime = 0f;
+    private float _decisionTimer = 0f;
+    private float _targetSpeedForCorner = 120f;
 
     private void Awake()
     {
-        agent = GetComponent<NavMeshAgent>();
-        carController = GetComponent<PrometeoCarController>();
-        rb = GetComponent<Rigidbody>();
+        _agent = GetComponent<NavMeshAgent>();
+        _carController = GetComponent<PrometeoCarController>();
+        _rb = GetComponent<Rigidbody>();
 
-        if (agent != null)
+        if (_settings != null)
         {
-            agent.updatePosition = false;
-            agent.updateRotation = false;
-            agent.updateUpAxis = false;
+            _ai = _settings.bot.ai;
+        }
+        else
+        {
+            Debug.LogWarning("PrometeoGTAAIController: VehiclesSettings не назначен, используются значения по умолчанию.", this);
+            _ai = new BotAISettings();
+        }
+
+        _startAccelerationTimer = _ai.startAccelerationTime;
+        _targetSpeedForCorner = _ai.baseMaxSpeed;
+
+        if (_agent != null)
+        {
+            _agent.updatePosition = false;
+            _agent.updateRotation = false;
+            _agent.updateUpAxis = false;
         }
 
         InitializePersonality();
-        targetLane = currentLane;
+        _targetLane = _currentLane;
     }
 
     private void InitializePersonality()
     {
-        if (personality == AIPersonality.Random)
+        if (_personality == AIPersonality.Random)
         {
             AIPersonality[] types = { AIPersonality.Bully, AIPersonality.Cautious, AIPersonality.Strategist };
-            personality = types[UnityEngine.Random.Range(0, types.Length)];
+            _personality = types[UnityEngine.Random.Range(0, types.Length)];
         }
 
-        switch (personality)
+        switch (_personality)
         {
             case AIPersonality.Bully:
-                nitroMultiplier = 1.65f;
-                laneChangeSpeed = 8.0f;
+                _tuning = _ai.bully;
                 break;
             case AIPersonality.Cautious:
-                nitroMultiplier = 1.15f;
-                laneChangeSpeed = 2.5f;
+                _tuning = _ai.cautious;
                 break;
-            case AIPersonality.Strategist:
-                nitroMultiplier = 1.35f;
-                laneChangeSpeed = 5.0f;
+            default:
+                _tuning = _ai.strategist;
                 break;
         }
     }
 
     private void Start()
     {
-        if (splineContainer != null && splineContainer.Splines.Count > 0)
+        if (_splineContainer != null && _splineContainer.Splines.Count > 0)
         {
             SnapToRoadOnStart();
         }
@@ -127,37 +135,65 @@ public class PrometeoGTAAIController : MonoBehaviour
 
     private void Update()
     {
-        if (splineContainer == null || splineContainer.Splines.Count == 0) return;
+        if (GameState.IsPaused) return;
 
-        // Отсчет стартового разгона (первые 3 секунды никому не мешаем, набираем скорость)
-        if (startAccelerationTimer > 0f)
+        if (_splineContainer == null || _splineContainer.Splines.Count == 0) return;
+
+        if (_crashCooldownTimer > 0f) _crashCooldownTimer -= Time.deltaTime;
+
+        if (_crashTimer > 0f)
         {
-            startAccelerationTimer -= Time.deltaTime;
+            _crashTimer -= Time.deltaTime;
+            _carController.ThrottleOff();
+            _carController.ResetSteeringAngle();
+            return;
+        }
+
+        if (_crashAirborne)
+        {
+            if (IsGrounded())
+            {
+                _crashAirborne = false;
+            }
+            else
+            {
+                _carController.ThrottleOff();
+                _carController.ResetSteeringAngle();
+                return;
+            }
+        }
+
+        if (HandleFlipRecovery()) return;
+
+        if (_startAccelerationTimer > 0f)
+        {
+            _startAccelerationTimer -= Time.deltaTime;
             UpdateSplineNavigation();
             return;
         }
 
-        decisionTimer += Time.deltaTime;
-        if (decisionTimer >= 0.15f)
+        _decisionTimer += Time.deltaTime;
+        if (_decisionTimer >= _ai.decisionInterval)
         {
-            decisionTimer = 0f;
-            EvaluateAABehavior();
+            _decisionTimer = 0f;
+            EvaluateAIBehavior();
         }
 
-        if (bullyCooldown > 0f) bullyCooldown -= Time.deltaTime;
-        if (laneDecisionCooldown > 0f) laneDecisionCooldown -= Time.deltaTime;
+        if (_bullyCooldown > 0f) _bullyCooldown -= Time.deltaTime;
+        if (_laneDecisionCooldown > 0f) _laneDecisionCooldown -= Time.deltaTime;
 
-        // Отмена тарана задиры при подходе к опасной границе
-        if (isBullyHunting)
+        if (_isBullyHunting)
         {
             float myOffset = GetCurrentDistanceFromCenter();
-            float targetOffset = bullyTarget != null ? GetDistanceFromCenter(bullyTarget.position) : 0f;
+            float targetOffset = _bullyTarget != null ? GetDistanceFromCenter(_bullyTarget.position) : 0f;
 
-            if (bullyTarget == null || myOffset >= (maxRoadBoundary - 2.5f) || targetOffset >= (maxRoadBoundary - 1f))
+            if (_bullyTarget == null ||
+                myOffset >= (_ai.maxRoadBoundary - _ai.bullyBoundaryMarginSelf) ||
+                targetOffset >= (_ai.maxRoadBoundary - _ai.bullyBoundaryMarginTarget))
             {
-                isBullyHunting = false;
-                bullyTarget = null;
-                bullyCooldown = 4.0f;
+                _isBullyHunting = false;
+                _bullyTarget = null;
+                _bullyCooldown = _ai.bullyCooldown;
                 SwitchToLane(DrivingLane.Center);
             }
         }
@@ -168,74 +204,72 @@ public class PrometeoGTAAIController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (carController == null || rb == null) return;
+        if (GameState.IsPaused) return;
 
-        float currentSpeed = Mathf.Abs(carController.carSpeed);
-        targetSpeedForCorner = EvaluateCorneringSpeed();
+        if (_carController == null || _rb == null) return;
 
-        // В самом начале гонки (первые 3 секунды) — газ в пол без ограничений для быстрого старта!
-        if (startAccelerationTimer > 0f)
+        if (_crashTimer > 0f || _crashAirborne) return;
+
+        float currentSpeed = Mathf.Abs(_carController.carSpeed);
+        _targetSpeedForCorner = EvaluateCorneringSpeed();
+
+        if (_startAccelerationTimer > 0f)
         {
-            carController.CancelInvoke("DecelerateCar");
-            carController.GoForward();
+            _carController.CancelInvoke("DecelerateCar");
+            _carController.GoForward();
             return;
         }
 
-        bool wantNitro = (personality == AIPersonality.Bully) ? (targetSpeedForCorner >= baseMaxSpeed * 0.85f) : (targetSpeedForCorner >= baseMaxSpeed * 0.95f);
-        isUsingNitro = allowNitroBoostCheck() && wantNitro;
+        bool wantNitro = _targetSpeedForCorner >= _ai.baseMaxSpeed * _tuning.nitroSpeedFraction;
+        _isUsingNitro = _tuning.allowNitro && wantNitro;
 
-        float desiredSpeed = isUsingNitro ? baseMaxSpeed * nitroMultiplier : targetSpeedForCorner;
+        float desiredSpeed = _isUsingNitro ? _ai.baseMaxSpeed * _tuning.nitroMultiplier : _targetSpeedForCorner;
 
         ApplyArcadeGripAndBrakes(currentSpeed, desiredSpeed);
     }
 
-    private bool allowNitroBoostCheck()
-    {
-        return personality != AIPersonality.Cautious;
-    }
-
     private void SnapToRoadOnStart()
     {
-        Spline spline = splineContainer.Splines[0];
-        Vector3 localPos = splineContainer.transform.InverseTransformPoint(transform.position);
+        Spline spline = _splineContainer.Splines[0];
+        Vector3 localPos = _splineContainer.transform.InverseTransformPoint(transform.position);
 
-        SplineUtility.GetNearestPoint(spline, localPos, out float3 nearestPoint, out normalizedSplineTime);
+        SplineUtility.GetNearestPoint(spline, localPos, out float3 nearestPoint, out _normalizedSplineTime);
 
-        Vector3 spawnPosition = GetEvaluatedPositionWithLaneOffset(normalizedSplineTime, currentLane);
-        Vector3 forwardTangent = GetEvaluatedTangent(normalizedSplineTime);
+        Vector3 spawnPosition = GetEvaluatedPositionWithLaneOffset(_normalizedSplineTime, _currentLane);
+        Vector3 forwardTangent = GetEvaluatedTangent(_normalizedSplineTime);
 
         transform.position = spawnPosition;
         if (forwardTangent != Vector3.zero) transform.rotation = Quaternion.LookRotation(forwardTangent, Vector3.up);
 
-        if (agent != null && agent.isOnNavMesh) agent.Warp(spawnPosition);
+        if (_agent != null && _agent.isOnNavMesh) _agent.Warp(spawnPosition);
 
-        if (rb != null)
+        if (_rb != null)
         {
-            rb.velocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
-            rb.Sleep();
+            _rb.velocity = Vector3.zero;
+            _rb.angularVelocity = Vector3.zero;
+            _rb.Sleep();
         }
     }
 
     private Vector3 GetEvaluatedPositionWithLaneOffset(float t, DrivingLane lane)
     {
-        Spline spline = splineContainer.Splines[0];
+        Spline spline = _splineContainer.Splines[0];
         float3 localPos = SplineUtility.EvaluatePosition(spline, t);
         float3 localTangent = SplineUtility.EvaluateTangent(spline, t);
 
-        Vector3 worldPos = splineContainer.transform.TransformPoint((Vector3)localPos);
-        Vector3 worldTangent = splineContainer.transform.TransformDirection((Vector3)localTangent).normalized;
+        Vector3 worldPos = _splineContainer.transform.TransformPoint((Vector3)localPos);
+        Vector3 worldTangent = _splineContainer.transform.TransformDirection((Vector3)localTangent).normalized;
 
         Vector3 rightDir = Vector3.Cross(Vector3.up, worldTangent).normalized;
-        float clampedOffset = Mathf.Clamp((int)lane * laneOffsetDistance, -maxRoadBoundary, maxRoadBoundary);
+        float clampedOffset = Mathf.Clamp((int)lane * _ai.laneOffsetDistance, -_ai.maxRoadBoundary, _ai.maxRoadBoundary);
         return worldPos + (rightDir * clampedOffset);
     }
 
     private Vector3 GetEvaluatedTangent(float t)
     {
-        Spline spline = splineContainer.Splines[0];
+        Spline spline = _splineContainer.Splines[0];
         float3 localTangent = SplineUtility.EvaluateTangent(spline, t);
-        return splineContainer.transform.TransformDirection((Vector3)localTangent).normalized;
+        return _splineContainer.transform.TransformDirection((Vector3)localTangent).normalized;
     }
 
     private float GetCurrentDistanceFromCenter()
@@ -245,61 +279,60 @@ public class PrometeoGTAAIController : MonoBehaviour
 
     private float GetDistanceFromCenter(Vector3 pos)
     {
-        Spline spline = splineContainer.Splines[0];
-        Vector3 localPos = splineContainer.transform.InverseTransformPoint(pos);
+        Spline spline = _splineContainer.Splines[0];
+        Vector3 localPos = _splineContainer.transform.InverseTransformPoint(pos);
         SplineUtility.GetNearestPoint(spline, localPos, out _, out float t);
-        Vector3 centerPos = splineContainer.transform.TransformPoint((Vector3)SplineUtility.EvaluatePosition(spline, t));
+        Vector3 centerPos = _splineContainer.transform.TransformPoint((Vector3)SplineUtility.EvaluatePosition(spline, t));
         return Vector3.Distance(new Vector3(pos.x, 0, pos.z), new Vector3(centerPos.x, 0, centerPos.z));
     }
 
     private void UpdateSplineNavigation()
     {
-        Spline spline = splineContainer.Splines[0];
+        Spline spline = _splineContainer.Splines[0];
         float splineLength = spline.GetLength();
         if (splineLength <= 0f) return;
 
-        Vector3 localPos = splineContainer.transform.InverseTransformPoint(transform.position);
-        SplineUtility.GetNearestPoint(spline, localPos, out _, out normalizedSplineTime);
+        Vector3 localPos = _splineContainer.transform.InverseTransformPoint(transform.position);
+        SplineUtility.GetNearestPoint(spline, localPos, out _, out _normalizedSplineTime);
 
-        // АВАРИЙНЫЙ ВОЗВРАТ: Если тачку вынесло за 15 метров
-        if (GetCurrentDistanceFromCenter() > maxRoadBoundary)
+        if (GetCurrentDistanceFromCenter() > _ai.maxRoadBoundary)
         {
-            isBullyHunting = false;
-            Vector3 centerSafePos = GetEvaluatedPositionWithLaneOffset(normalizedSplineTime, DrivingLane.Center);
-            transform.position = Vector3.Lerp(transform.position, centerSafePos, Time.deltaTime * 6f);
+            _isBullyHunting = false;
+            Vector3 centerSafePos = GetEvaluatedPositionWithLaneOffset(_normalizedSplineTime, DrivingLane.Center);
+            transform.position = Vector3.Lerp(transform.position, centerSafePos, Time.deltaTime * _ai.emergencyReturnSpeed);
             return;
         }
 
-        float currentSpeed = Mathf.Abs(carController.carSpeed);
-        float dynamicLookAhead = baseLookAhead + (currentSpeed * speedLookAheadFactor);
-        float targetNormalizedTime = Mathf.Repeat(((normalizedSplineTime * splineLength) + dynamicLookAhead) / splineLength, 1f);
+        float currentSpeed = Mathf.Abs(_carController.carSpeed);
+        float dynamicLookAhead = _ai.baseLookAhead + (currentSpeed * _ai.speedLookAheadFactor);
+        float targetNormalizedTime = Mathf.Repeat(((_normalizedSplineTime * splineLength) + dynamicLookAhead) / splineLength, 1f);
 
-        DrivingLane activeLane = isLaneChanging ? (laneChangeProgress < 0.5f ? currentLane : targetLane) : currentLane;
+        DrivingLane activeLane = _isLaneChanging
+            ? (_laneChangeProgress < _ai.laneChangeMidpoint ? _currentLane : _targetLane)
+            : _currentLane;
         Vector3 worldTargetPos = GetEvaluatedPositionWithLaneOffset(targetNormalizedTime, activeLane);
 
-        // Преследование задиры (включается только после окончания стартового разгона)
-        if (isBullyHunting && bullyTarget != null && startAccelerationTimer <= 0f)
+        if (_isBullyHunting && _bullyTarget != null && _startAccelerationTimer <= 0f)
         {
-            worldTargetPos = bullyTarget.position;
+            worldTargetPos = _bullyTarget.position;
         }
 
-        if (agent != null && agent.isOnNavMesh)
+        if (_agent != null && _agent.isOnNavMesh)
         {
-            agent.nextPosition = transform.position;
-            agent.SetDestination(worldTargetPos);
+            _agent.nextPosition = transform.position;
+            _agent.SetDestination(worldTargetPos);
         }
 
         ApplySteering(worldTargetPos);
     }
 
-    private void EvaluateAABehavior()
+    private void EvaluateAIBehavior()
     {
-        if (isLaneChanging || laneDecisionCooldown > 0f) return;
+        if (_isLaneChanging || _laneDecisionCooldown > 0f) return;
 
-        // 1. Поведение ЗАДИРЫ: ищет жертву для выталкивания
-        if (personality == AIPersonality.Bully && !isBullyHunting && bullyCooldown <= 0f)
+        if (_tuning.canBullyHunt && !_isBullyHunting && _bullyCooldown <= 0f)
         {
-            Collider[] hits = Physics.OverlapSphere(transform.position, bullySearchRadius);
+            Collider[] hits = Physics.OverlapSphere(transform.position, _ai.bullySearchRadius);
             foreach (var hit in hits)
             {
                 var otherAI = hit.GetComponentInParent<PrometeoGTAAIController>();
@@ -312,18 +345,18 @@ public class PrometeoGTAAIController : MonoBehaviour
                 if (enemyTransform != null)
                 {
                     float enemyOffsetFromCenter = GetDistanceFromCenter(enemyTransform.position);
-                    if (enemyOffsetFromCenter > 4f)
+                    if (enemyOffsetFromCenter > _ai.bullyMinTargetOffset)
                     {
-                        isBullyHunting = true;
-                        bullyTarget = enemyTransform;
+                        _isBullyHunting = true;
+                        _bullyTarget = enemyTransform;
                         return;
                     }
                 }
             }
         }
 
-        // 2. Умный выбор полосы при препятствии впереди
-        if (Physics.SphereCast(transform.position + Vector3.up * 0.5f, 1.8f, transform.forward, out RaycastHit hitInfo, 22f))
+        Vector3 castOrigin = transform.position + Vector3.up * _ai.obstacleCastOriginHeight;
+        if (Physics.SphereCast(castOrigin, _ai.obstacleDetectRadius, transform.forward, out RaycastHit hitInfo, _ai.obstacleDetectDistance))
         {
             var otherAI = hitInfo.collider.GetComponentInParent<PrometeoGTAAIController>();
             var vehicleScript = hitInfo.collider.GetComponentInParent<Vehicle>();
@@ -331,10 +364,10 @@ public class PrometeoGTAAIController : MonoBehaviour
             if ((otherAI != null && otherAI != this) || vehicleScript != null)
             {
                 DrivingLane bestLane = SelectBestAvailableLane();
-                if (bestLane != currentLane)
+                if (bestLane != _currentLane)
                 {
                     SwitchToLane(bestLane);
-                    laneDecisionCooldown = 2.0f;
+                    _laneDecisionCooldown = _ai.laneDecisionCooldown;
                 }
             }
         }
@@ -343,26 +376,27 @@ public class PrometeoGTAAIController : MonoBehaviour
     private DrivingLane SelectBestAvailableLane()
     {
         DrivingLane[] possibleLanes = { DrivingLane.Left, DrivingLane.Center, DrivingLane.Right };
-        DrivingLane bestLane = currentLane;
+        DrivingLane bestLane = _currentLane;
         float maxScore = -999f;
 
         foreach (DrivingLane lane in possibleLanes)
         {
-            if (lane == currentLane) continue;
+            if (lane == _currentLane) continue;
 
-            Vector3 laneCheckPos = GetEvaluatedPositionWithLaneOffset(normalizedSplineTime, lane);
-            float score = 10f;
+            Vector3 laneCheckPos = GetEvaluatedPositionWithLaneOffset(_normalizedSplineTime, lane);
+            float score = _ai.laneBaseScore;
 
-            if (Mathf.Abs((int)lane * laneOffsetDistance) > maxRoadBoundary) continue;
+            if (Mathf.Abs((int)lane * _ai.laneOffsetDistance) > _ai.maxRoadBoundary) continue;
 
-            if (Physics.SphereCast(laneCheckPos + Vector3.up * 0.5f, 1.5f, transform.forward, out _, 15f))
+            Vector3 checkOrigin = laneCheckPos + Vector3.up * _ai.obstacleCastOriginHeight;
+            if (Physics.SphereCast(checkOrigin, _ai.laneCheckRadius, transform.forward, out _, _ai.laneCheckDistance))
             {
-                score -= 20f;
+                score -= _ai.laneBlockedPenalty;
             }
 
-            if (personality == AIPersonality.Cautious && lane != DrivingLane.Center)
+            if (lane != DrivingLane.Center)
             {
-                score += 5f;
+                score += _tuning.sideLaneBonus;
             }
 
             if (score > maxScore)
@@ -377,77 +411,77 @@ public class PrometeoGTAAIController : MonoBehaviour
 
     private void SwitchToLane(DrivingLane newLane)
     {
-        if (newLane == currentLane) return;
-        targetLane = newLane;
-        isLaneChanging = true;
-        laneChangeProgress = 0f;
+        if (newLane == _currentLane) return;
+        _targetLane = newLane;
+        _isLaneChanging = true;
+        _laneChangeProgress = 0f;
     }
 
     private void UpdateLaneTransition()
     {
-        if (!isLaneChanging) return;
+        if (!_isLaneChanging) return;
 
-        laneChangeProgress += Time.deltaTime * laneChangeSpeed;
-        if (laneChangeProgress >= 1f)
+        _laneChangeProgress += Time.deltaTime * _tuning.laneChangeSpeed;
+        if (_laneChangeProgress >= 1f)
         {
-            currentLane = targetLane;
-            isLaneChanging = false;
+            _currentLane = _targetLane;
+            _isLaneChanging = false;
         }
     }
 
     private float EvaluateCorneringSpeed()
     {
-        Spline spline = splineContainer.Splines[0];
+        Spline spline = _splineContainer.Splines[0];
         float splineLength = spline.GetLength();
-        if (splineLength <= 0f) return baseMaxSpeed;
+        if (splineLength <= 0f) return _ai.baseMaxSpeed;
 
         float minDot = 1f;
-        int checkSteps = 10;
+        int checkSteps = Mathf.Max(1, _ai.cornerCheckSteps);
 
         for (int i = 1; i <= checkSteps; i++)
         {
-            float dist = (cornerCheckDistance / checkSteps) * i;
-            float checkTime = Mathf.Repeat(normalizedSplineTime + (dist / splineLength), 1f);
+            float dist = (_ai.cornerCheckDistance / checkSteps) * i;
+            float checkTime = Mathf.Repeat(_normalizedSplineTime + (dist / splineLength), 1f);
 
-            Vector3 currentDir = GetEvaluatedTangent(normalizedSplineTime);
+            Vector3 currentDir = GetEvaluatedTangent(_normalizedSplineTime);
             Vector3 futureDir = GetEvaluatedTangent(checkTime);
 
             float dot = Vector3.Dot(currentDir, futureDir);
             if (dot < minDot) minDot = dot;
         }
 
-        if (minDot < 0.94f)
+        if (minDot < _ai.cornerSharpnessDot)
         {
-            float brakeStrength = (personality == AIPersonality.Cautious) ? 0.35f : (personality == AIPersonality.Bully ? 0.6f : 0.45f);
-            float cornerFactor = Mathf.InverseLerp(-0.3f, 0.94f, minDot);
-            return Mathf.Lerp(baseMaxSpeed * brakeStrength, baseMaxSpeed, cornerFactor);
+            float cornerFactor = Mathf.InverseLerp(_ai.cornerMinDot, _ai.cornerSharpnessDot, minDot);
+            return Mathf.Lerp(_ai.baseMaxSpeed * _tuning.cornerBrakeStrength, _ai.baseMaxSpeed, cornerFactor);
         }
 
-        return baseMaxSpeed;
+        return _ai.baseMaxSpeed;
     }
 
     private void ApplyArcadeGripAndBrakes(float currentSpeed, float desiredSpeed)
     {
-        if (currentSpeed > desiredSpeed + 1f)
+        if (currentSpeed > desiredSpeed + _ai.brakeOvershootTolerance)
         {
-            carController.ThrottleOff();
-            carController.Brakes();
-            rb.AddForce(-rb.velocity.normalized * (physicalBrakePower * 1.5f), ForceMode.Acceleration);
+            _carController.ThrottleOff();
+            _carController.Brakes();
+            _rb.AddForce(-_rb.velocity.normalized * (_ai.physicalBrakePower * _ai.brakeForceMultiplier), ForceMode.Acceleration);
         }
         else if (currentSpeed < desiredSpeed)
         {
-            carController.CancelInvoke("DecelerateCar");
-            carController.GoForward();
+            _carController.CancelInvoke("DecelerateCar");
+            _carController.GoForward();
         }
         else
         {
-            carController.ThrottleOff();
+            _carController.ThrottleOff();
         }
 
-        if (targetSpeedForCorner < baseMaxSpeed * 0.7f && rb.velocity.sqrMagnitude > 25f)
+        if (_targetSpeedForCorner < _ai.baseMaxSpeed * _ai.gripAlignSpeedFraction &&
+            _rb.velocity.sqrMagnitude > _ai.gripAlignMinSqrSpeed)
         {
-            Vector3 roadTangent = GetEvaluatedTangent(normalizedSplineTime);
-            rb.velocity = Vector3.Lerp(rb.velocity, roadTangent * currentSpeed, Time.fixedDeltaTime * 3f);
+            Vector3 roadTangent = GetEvaluatedTangent(_normalizedSplineTime);
+            _rb.velocity = Vector3.Lerp(_rb.velocity, roadTangent * currentSpeed, Time.fixedDeltaTime * _ai.gripAlignRate);
         }
     }
 
@@ -455,21 +489,95 @@ public class PrometeoGTAAIController : MonoBehaviour
     {
         Vector3 localTarget = transform.InverseTransformPoint(targetPosition);
         float angleToTarget = Mathf.Atan2(localTarget.x, Mathf.Abs(localTarget.z)) * Mathf.Rad2Deg;
-        float turnSpeed = rb.angularVelocity.y * Mathf.Rad2Deg;
-        float predictedAngle = angleToTarget - (turnSpeed * predictionFactor);
+        float turnSpeed = _rb.angularVelocity.y * Mathf.Rad2Deg;
+        float predictedAngle = angleToTarget - (turnSpeed * _ai.predictionFactor);
 
-        if (Mathf.Abs(predictedAngle) < steerDeadzone)
+        float steerInput = Mathf.Abs(predictedAngle) < _ai.steerDeadzone
+            ? 0f
+            : Mathf.Clamp(predictedAngle / _carController.MaxSteeringAngle, -1f, 1f);
+
+        _carController.SetSteering(steerInput);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (GameState.IsPaused || _rb == null) return;
+        if (_crashCooldownTimer > 0f || _startAccelerationTimer > 0f) return;
+
+        ContactPoint contact = collision.GetContact(0);
+
+        if (contact.normal.y > _ai.groundNormalMinY) return;
+
+        float impactSpeed = collision.relativeVelocity.magnitude;
+        if (impactSpeed < _ai.crashImpactThreshold) return;
+
+        float impact = Mathf.InverseLerp(
+            _ai.crashImpactThreshold,
+            _ai.crashImpactThreshold * _ai.crashMaxImpactMultiplier,
+            impactSpeed);
+
+        float upSpeed = Mathf.Lerp(_ai.launchUpSpeedMin, _ai.launchUpSpeedMax, impact);
+        _rb.AddForce(Vector3.up * upSpeed, ForceMode.VelocityChange);
+
+        Vector3 tumbleAxis = Vector3.Cross(Vector3.up, contact.normal);
+        if (tumbleAxis.sqrMagnitude < 0.001f) tumbleAxis = transform.right;
+        tumbleAxis.Normalize();
+
+        Vector3 torque =
+            tumbleAxis * (_ai.launchTumbleSpeed * impact) +
+            Vector3.up * (UnityEngine.Random.Range(-1f, 1f) * _ai.launchYawSpeed * impact);
+        _rb.AddTorque(torque, ForceMode.VelocityChange);
+
+        _isBullyHunting = false;
+        _bullyTarget = null;
+
+        _crashTimer = _ai.crashRecoveryTime * (_ai.crashRecoveryMinFactor + impact);
+        _crashAirborne = true;
+        _crashCooldownTimer = _ai.crashCooldown;
+        _flipTimer = 0f;
+    }
+
+    private bool HandleFlipRecovery()
+    {
+        bool isFlipped = Vector3.Dot(transform.up, Vector3.up) < _ai.flipUpDot;
+
+        if (!isFlipped || _rb.velocity.sqrMagnitude > _ai.flipMaxSqrSpeed)
         {
-            carController.ResetSteeringAngle();
+            _flipTimer = 0f;
+            return false;
         }
-        else if (predictedAngle > 0f)
+
+        _flipTimer += Time.deltaTime;
+        _carController.ThrottleOff();
+
+        if (_flipTimer >= _ai.flipRecoveryTime)
         {
-            carController.TurnRight();
+            _flipTimer = 0f;
+
+            Vector3 flatForward = Vector3.ProjectOnPlane(transform.forward, Vector3.up);
+            if (flatForward.sqrMagnitude < 0.001f) flatForward = Vector3.ProjectOnPlane(transform.up, Vector3.up);
+            if (flatForward.sqrMagnitude < 0.001f) flatForward = Vector3.forward;
+
+            _rb.velocity = Vector3.zero;
+            _rb.angularVelocity = Vector3.zero;
+            _rb.position += Vector3.up * _ai.flipLiftHeight;
+            _rb.rotation = Quaternion.LookRotation(flatForward.normalized, Vector3.up);
         }
-        else
+
+        return true;
+    }
+
+    private bool IsGrounded()
+    {
+        Vector3 origin = transform.position + Vector3.up * _ai.groundCheckOriginHeight;
+        RaycastHit[] hits = Physics.RaycastAll(origin, Vector3.down, _ai.groundCheckDistance, ~0, QueryTriggerInteraction.Ignore);
+
+        foreach (RaycastHit h in hits)
         {
-            carController.TurnLeft();
+            if (h.rigidbody != _rb) return true;
         }
+
+        return false;
     }
 
     public void SetLane(DrivingLane newLane)

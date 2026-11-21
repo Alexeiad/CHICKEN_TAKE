@@ -1,0 +1,160 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dccae044afb46c54a80ad28c8cdbfbbd, type: 3}
+  m_Name: VehiclesSettings
+  m_EditorClassIdentifier: 
+  shared:
+    maxReverseSpeed: 45
+    drivenWheels: 4
+    maxSteeringAngle: 27
+    brakeForce: 350
+    bodyMassCenter: {x: 0, y: 0, z: 0}
+    steerSpeedRate: 10
+    wheelTurnRate: 20
+    handbrakeDriftMultiplier: 5
+    handbrakeBrakeMultiplier: 2
+    driftRecoveryTime: 1.5
+    useGearbox: 1
+    idleRPM: 800
+    maxRPM: 6500
+    shiftTime: 0.25
+    torqueWhileShifting: 0.5
+    engineBrakeForce: 600
+  player:
+    tuning:
+      gears:
+      - maxSpeed: 20
+        acceleration: 2
+        powerMultiplier: 1
+      - maxSpeed: 40
+        acceleration: 3
+        powerMultiplier: 1
+      - maxSpeed: 60
+        acceleration: 3
+        powerMultiplier: 1
+      - maxSpeed: 120
+        acceleration: 2
+        powerMultiplier: 1
+      - maxSpeed: 150
+        acceleration: 1
+        powerMultiplier: 1
+      - maxSpeed: 180
+        acceleration: 0.5
+        powerMultiplier: 1
+      steeringSpeed: 0.5
+      globalPowerMultiplier: 1
+      reverseAcceleration: 0.9
+      useEffects: 1
+      useSounds: 1
+    useUI: 1
+    useTouchControls: 0
+  bot:
+    tuning:
+      gears:
+      - maxSpeed: 20
+        acceleration: 2
+        powerMultiplier: 1
+      - maxSpeed: 40
+        acceleration: 3
+        powerMultiplier: 1
+      - maxSpeed: 60
+        acceleration: 3
+        powerMultiplier: 1
+      - maxSpeed: 120
+        acceleration: 2
+        powerMultiplier: 1
+      - maxSpeed: 150
+        acceleration: 1
+        powerMultiplier: 1
+      - maxSpeed: 180
+        acceleration: 0.5
+        powerMultiplier: 1
+      steeringSpeed: 0.5
+      globalPowerMultiplier: 1
+      reverseAcceleration: 0.9
+      useEffects: 1
+      useSounds: 1
+    ai:
+      bully:
+        canBullyHunt: 1
+        allowNitro: 1
+        nitroMultiplier: 1.65
+        nitroSpeedFraction: 0.85
+        laneChangeSpeed: 8
+        cornerBrakeStrength: 0.6
+        sideLaneBonus: 0
+      cautious:
+        canBullyHunt: 0
+        allowNitro: 0
+        nitroMultiplier: 1.15
+        nitroSpeedFraction: 0.95
+        laneChangeSpeed: 2.5
+        cornerBrakeStrength: 0.35
+        sideLaneBonus: 5
+      strategist:
+        canBullyHunt: 0
+        allowNitro: 1
+        nitroMultiplier: 1.35
+        nitroSpeedFraction: 0.95
+        laneChangeSpeed: 5
+        cornerBrakeStrength: 0.45
+        sideLaneBonus: 0
+      laneOffsetDistance: 5
+      maxRoadBoundary: 15
+      emergencyReturnSpeed: 6
+      laneChangeMidpoint: 0.5
+      startAccelerationTime: 3
+      decisionInterval: 0.15
+      laneDecisionCooldown: 2
+      baseMaxSpeed: 120
+      physicalBrakePower: 45
+      brakeOvershootTolerance: 1
+      brakeForceMultiplier: 1.5
+      baseLookAhead: 22
+      speedLookAheadFactor: 0.15
+      cornerCheckDistance: 40
+      cornerCheckSteps: 10
+      cornerSharpnessDot: 0.94
+      cornerMinDot: -0.3
+      gripAlignSpeedFraction: 0.7
+      gripAlignMinSqrSpeed: 25
+      gripAlignRate: 3
+      predictionFactor: 0.15
+      steerDeadzone: 1.5
+      obstacleCastOriginHeight: 0.5
+      obstacleDetectRadius: 1.8
+      obstacleDetectDistance: 22
+      laneCheckRadius: 1.5
+      laneCheckDistance: 15
+      laneBaseScore: 10
+      laneBlockedPenalty: 20
+      bullySearchRadius: 30
+      bullyMinTargetOffset: 4
+      bullyBoundaryMarginSelf: 2.5
+      bullyBoundaryMarginTarget: 1
+      bullyCooldown: 4
+      crashImpactThreshold: 12
+      crashMaxImpactMultiplier: 3
+      groundNormalMinY: 0.7
+      launchUpSpeedMin: 3
+      launchUpSpeedMax: 9
+      launchTumbleSpeed: 4
+      launchYawSpeed: 3
+      crashRecoveryTime: 1.2
+      crashRecoveryMinFactor: 0.5
+      crashCooldown: 0.6
+      groundCheckDistance: 1.5
+      groundCheckOriginHeight: 0.5
+      flipRecoveryTime: 2
+      flipUpDot: 0.5
+      flipMaxSqrSpeed: 4
+      flipLiftHeight: 1

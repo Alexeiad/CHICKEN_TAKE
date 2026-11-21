@@ -23,6 +23,8 @@ public class TutorialCrateHighlight : MonoBehaviour
 
     void Update()
     {
+        if (GameState.IsPaused) return;
+
         float target = alwaysOn || (player != null &&
             Vector3.Distance(player.position, transform.position) < triggerDistance) ? 1f : 0f;
 

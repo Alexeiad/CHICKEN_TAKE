@@ -66,11 +66,13 @@ public sealed class Speedometer : MonoBehaviour
 
     private void Update()
     {
+        if (GameState.IsPaused) return;
+
         float dt = Time.deltaTime;
         if (dt <= 0f) return;
 
         float rawKmh = ReadSpeedKmh(dt);
-        _currentKmh = Mathf.SmoothDamp(_currentKmh, rawKmh, ref _needleVel, _smoothTime);
+        _currentKmh = Mathf.SmoothDamp(_currentKmh, rawKmh, ref _needleVel, _smoothTime, Mathf.Infinity, dt);
 
         float t = Mathf.Clamp01(_currentKmh / Mathf.Max(1f, _maxSpeedKmh));
 

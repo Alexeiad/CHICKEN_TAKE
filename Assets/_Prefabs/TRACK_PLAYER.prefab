@@ -320,80 +320,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0fefceefe666bb4682b272ec8c5bdd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _settings: {fileID: 11400000, guid: 82a203c75abc9624dacbe12152d113a9, type: 2}
   isAi: 0
-  maxSpeed: 140
-  maxReverseSpeed: 30
-  drivenWheels: 4
-  maxSteeringAngle: 20
-  steeringSpeed: 2.09
-  brakeForce: 600
-  decelerationMultiplier: 1
-  handbrakeDriftMultiplier: 100
-  engineBrakeForce: 622
-  targetAccelerationCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0.072948456
-      value: 1.006347
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 31.50557
-      value: 0.9868393
-      inSlope: -0.0011957979
-      outSlope: -0.0011957979
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.35524404
-    - serializedVersion: 3
-      time: 70.85765
-      value: 1.2175673
-      inSlope: -0.004714594
-      outSlope: -0.004714594
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.23689637
-      outWeight: 0.40020493
-    - serializedVersion: 3
-      time: 84.54185
-      value: 1.0477163
-      inSlope: -0.00612156
-      outSlope: -0.00612156
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.2366725
-    - serializedVersion: 3
-      time: 149.04797
-      value: 0.49695432
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  powerMultiplier: 2
-  useGearbox: 1
-  gearTopSpeeds:
-  - 10
-  - 30
-  - 50
-  - 80
-  - 140
-  shiftHysteresis: 3
-  shiftCooldown: 0.3
-  idleRPM: 800
-  maxRPM: 6500
-  bodyMassCenter: {x: 0, y: 0, z: 0}
   frontLeftMesh: {fileID: 2563254511944741772}
   frontLeftCollider: {fileID: 3503526838149268231}
   frontRightMesh: {fileID: 9062298056425735180}
@@ -402,18 +330,14 @@ MonoBehaviour:
   rearLeftCollider: {fileID: 3203242203286592320}
   rearRightMesh: {fileID: 5962581445413552623}
   rearRightCollider: {fileID: 8635693744656812810}
-  useEffects: 1
   RLWParticleSystem: {fileID: 8604595067455279721}
   RRWParticleSystem: {fileID: 2342193664153044240}
   RLWTireSkid: {fileID: 0}
   RRWTireSkid: {fileID: 0}
-  useUI: 0
   carSpeedText: {fileID: 0}
   currentGearText: {fileID: 0}
-  useSounds: 0
   carEngineSound: {fileID: 0}
   tireScreechSound: {fileID: 0}
-  useTouchControls: 0
   throttleButton: {fileID: 0}
   reverseButton: {fileID: 0}
   turnRightButton: {fileID: 0}

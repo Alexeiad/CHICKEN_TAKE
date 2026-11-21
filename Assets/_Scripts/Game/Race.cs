@@ -15,6 +15,7 @@ public sealed class RacerState
     public float Progress { get; set; }
     public int Place { get; set; }
     public bool Finished { get; set; }
+    public bool IsPlayer { get; set; }
 
     /// <summary>Сторона от линии финиша: меньше 0 до линии, больше 0 после неё.</summary>
     public float FinishSide { get; set; }
@@ -30,6 +31,9 @@ public sealed class RacerState
 
     public Vector3 LastPosition { get; set; }
     public bool HasLastPosition { get; set; }
+
+    /// <summary>Накопленный путь за текущий интервал телеметрии, м.</summary>
+    public float IntervalDistanceMeters { get; set; }
 
     public RacerState(IEntity entity)
     {
@@ -49,6 +53,9 @@ public class Race : MonoBehaviour
     [Header("Настройки")]
     [SerializeField] private int _countdownFrom = 3;
 
+    [Tooltip("Как часто обновлять показатели и таблицу позиций (сек)")]
+    [SerializeField] private float _updateInterval = 0.5f;
+
     [Tooltip("Насколько далеко от сплайна может быть гонщик, чтобы участвовать")]
     [SerializeField] private float _maxDistanceFromTrack = 50f;
 
@@ -58,18 +65,18 @@ public class Race : MonoBehaviour
     [Tooltip("Максимальный скачок прогресса за кадр. Больше этого считается прыжком на другой участок трассы и игнорируется")]
     [SerializeField] private float _maxProgressStep = 0.1f;
 
+    [Header("События")]
+    [SerializeField] private RaceEventChannelSO _raceEvents;
+
     [Header("UI")]
     [SerializeField] private TMP_Text _countdownText;
     [SerializeField] private GameObject _finishWindow;
     [SerializeField] private TMP_Text _standingsText;
-    [SerializeField] private TMP_Text _resultsText;      // необязательно: итоговая таблица в окне финиша
+    [SerializeField] private TMP_Text _resultsText;
 
-    // Старт = узел с индексом 1 (до него разгонный отрезок), финиш = предпоследний узел.
-    // Чтобы финиш стоял после старта, нужно минимум 4 узла.
     private const int StartKnot = 1;
     private const int MinKnots = 4;
 
-    // Телеметрия: 1 юнит = 1 метр.
     private const float SpeedSmoothing = 8f;
     private const float MaxStepPerFrame = 20f;
 
@@ -84,6 +91,9 @@ public class Race : MonoBehaviour
     private Vector3 _finishPosition;
     private Vector3 _finishForward;
     private float _finishArriveT;
+    private float _updateTimer;
+    private float _elapsedSinceTick;
+    private bool _countdownActive;
     private bool _started;
     private bool _finished;
 
@@ -97,32 +107,57 @@ public class Race : MonoBehaviour
 
     private IEnumerator Start()
     {
-        _finishWindow.SetActive(false);
+        if (_finishWindow != null)
+            _finishWindow.SetActive(false);
+
         _finishT = CalculateFinishT();
         CacheFinishLine();
 
         SpawnGates();
+        SyncWithRegistry();
+        HoldRacersAtCurrentPositions();
 
         yield return Countdown();
 
+        _updateTimer = _updateInterval;
+        _elapsedSinceTick = 0f;
         _started = true;
+        _raceEvents?.RaiseRaceStarted();
     }
 
     private void Update()
     {
+        if (_countdownActive)
+            HoldRacersAtCurrentPositions();
+
         if (!_started || _finished) return;
 
-        SyncWithRegistry();
+        float dt = Time.deltaTime;
+        if (dt <= 0f) return;
 
-        if (_racers.Count == 0) return;
+        AccumulateMovement(dt);
 
-        UpdateProgress();
-        UpdateTelemetry();
-        UpdateStandings();
-        CheckFinish();
+        _updateTimer += dt;
+        if (_updateTimer >= _updateInterval)
+        {
+            float tickDt = _elapsedSinceTick;
+            _updateTimer %= _updateInterval;
+            _elapsedSinceTick = 0f;
+
+            SyncWithRegistry();
+
+            if (_racers.Count > 0)
+            {
+                UpdateProgress();
+                ApplyTelemetryTick(tickDt);
+                UpdateStandings();
+            }
+        }
+
+        if (_racers.Count > 0)
+            CheckFinish();
     }
 
-    // Старт = первый узел сплайна, финиш = предпоследний (тот же, что в CalculateFinishT).
     private void SpawnGates()
     {
         if (_track.Spline.Count < MinKnots) return;
@@ -131,7 +166,6 @@ public class Race : MonoBehaviour
         SpawnGate(_finishPrefab, _finishT);
     }
 
-    // Ворота смотрят вдоль направления трассы: ось Z модели = направление движения.
     private void SpawnGate(GameObject prefab, float t)
     {
         if (prefab == null)
@@ -227,17 +261,53 @@ public class Race : MonoBehaviour
 
     private IEnumerator Countdown()
     {
-        _countdownText.gameObject.SetActive(true);
-        StopTime();
+        _countdownActive = true;
+        GameState.Pause();
+        HoldRacersAtCurrentPositions();
+
+        if (_countdownText != null)
+            _countdownText.gameObject.SetActive(true);
 
         for (int i = _countdownFrom; i > 0; i--)
         {
-            _countdownText.text = i.ToString();
+            if (_countdownText != null)
+                _countdownText.text = i.ToString();
+
+            HoldRacersAtCurrentPositions();
             yield return new WaitForSecondsRealtime(1f);
         }
 
-        _countdownText.gameObject.SetActive(false);
-        StartTime();
+        if (_countdownText != null)
+            _countdownText.gameObject.SetActive(false);
+
+        _countdownActive = false;
+        GameState.Resume();
+    }
+
+    private void HoldRacersAtCurrentPositions()
+    {
+        foreach (RacerState racer in _racers)
+        {
+            if (racer.Entity == null || racer.Entity.Transform == null) continue;
+
+            Vector3 pos = racer.Entity.Transform.position;
+            if (!racer.HasLastPosition)
+            {
+                racer.LastPosition = pos;
+                racer.HasLastPosition = true;
+            }
+            else
+            {
+                racer.Entity.Transform.position = racer.LastPosition;
+            }
+
+            Rigidbody rb = racer.Entity.Transform.GetComponentInChildren<Rigidbody>();
+            if (rb != null && !rb.isKinematic)
+            {
+                rb.velocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+            }
+        }
     }
 
     private float CalculateStartT()
@@ -262,8 +332,6 @@ public class Race : MonoBehaviour
         return (float)finishKnot / curveCount;
     }
 
-    // Прогресс меняется только плавно. Скачок (задом через арку, участок трассы рядом
-    // по прямой) игнорируется, поэтому такой манёвр прогресс не даёт.
     private void UpdateProgress()
     {
         foreach (RacerState racer in _racers)
@@ -278,34 +346,42 @@ public class Race : MonoBehaviour
         }
     }
 
-    // Скорость и пробег считаются по реальному перемещению участника.
-    private void UpdateTelemetry()
+    private void AccumulateMovement(float dt)
     {
-        float dt = Time.deltaTime;
-        if (dt <= 0f) return;
-
-        float smoothing = 1f - Mathf.Exp(-SpeedSmoothing * dt);
+        _elapsedSinceTick += dt;
 
         foreach (RacerState racer in _racers)
         {
+            if (racer.Entity == null || racer.Entity.Transform == null) continue;
+
             Vector3 position = racer.Entity.Transform.position;
 
             if (racer.HasLastPosition)
             {
                 float step = Vector3.Distance(position, racer.LastPosition);
-
-                // Телепорт или респавн в пробег и скорость не идут.
                 if (step <= MaxStepPerFrame)
                 {
                     racer.DistanceMeters += step;
-
-                    float rawKmh = step / dt * 3.6f;
-                    racer.SpeedKmh = Mathf.Lerp(racer.SpeedKmh, rawKmh, smoothing);
+                    racer.IntervalDistanceMeters += step;
                 }
             }
 
             racer.LastPosition = position;
             racer.HasLastPosition = true;
+        }
+    }
+
+    private void ApplyTelemetryTick(float tickDt)
+    {
+        if (tickDt <= 0f) return;
+
+        float smoothing = 1f - Mathf.Exp(-SpeedSmoothing * tickDt);
+
+        foreach (RacerState racer in _racers)
+        {
+            float rawKmh = (racer.IntervalDistanceMeters / tickDt) * 3.6f;
+            racer.SpeedKmh = Mathf.Lerp(racer.SpeedKmh, rawKmh, smoothing);
+            racer.IntervalDistanceMeters = 0f;
         }
     }
 
@@ -321,9 +397,13 @@ public class Race : MonoBehaviour
         _racers.Sort((a, b) => b.Progress.CompareTo(a.Progress));
 
         for (int i = 0; i < _racers.Count; i++)
+        {
             _racers[i].Place = i + 1;
+            _racers[i].IsPlayer = _playerVehicle != null && ReferenceEquals(_racers[i].Entity, _playerVehicle);
+        }
 
         UpdateStandingsUI();
+        _raceEvents?.RaiseStandingsUpdated(_racers);
     }
 
     private void UpdateStandingsUI()
@@ -340,14 +420,13 @@ public class Race : MonoBehaviour
             if (i > 0) _sb.Append('\n');
 
             bool isLeader = i == 0;
-            bool isPlayer = _playerVehicle != null && ReferenceEquals(_racers[i].Entity, _playerVehicle);
+            bool isPlayer = _racers[i].IsPlayer;
 
             RacerState racer = _racers[i];
 
             string line = $"<pos=0%>{i + 1}<pos=8%>{racer.Name ?? "—"}{(isPlayer ? " (Вы)" : string.Empty)}" +
                           $"<pos=62%>{racer.SpeedKmh:F0}<pos=82%>{racer.DistanceKm:F2}";
 
-            // Игрок важнее: если ты первый — ты жёлтый, не зелёный
             if (isPlayer)
                 _sb.Append("<color=#FFD700>").Append(line).Append("</color>");
             else if (isLeader)
@@ -359,7 +438,6 @@ public class Race : MonoBehaviour
         _standingsText.text = _sb.ToString();
     }
 
-    // Линия финиша: точка предпоследнего узла и направление трассы в ней.
     private void CacheFinishLine()
     {
         if (_track.Spline.Count < MinKnots) return;
@@ -368,14 +446,9 @@ public class Race : MonoBehaviour
 
         _finishPosition = _track.transform.TransformPoint(position);
         _finishForward = _track.transform.TransformDirection(tangent).normalized;
-
-        // Финиш засчитывается, только если участник реально доехал до последнего отрезка перед линией.
         _finishArriveT = _finishT - 0.5f / (_track.Spline.Count - 1);
     }
 
-    // Финиш засчитывается только при пересечении линии по ходу трассы:
-    // из «до линии» (side < 0) в «после линии» (side >= 0). Задним ходом сторона
-    // меняется в обратную сторону и ничего не даёт, ближайшая точка сплайна не важна.
     private void CheckFinish()
     {
         foreach (RacerState racer in _racers)
@@ -406,18 +479,33 @@ public class Race : MonoBehaviour
         _racers.Insert(0, winner);
 
         for (int i = 0; i < _racers.Count; i++)
+        {
             _racers[i].Place = i + 1;
+            _racers[i].IsPlayer = _playerVehicle != null && ReferenceEquals(_racers[i].Entity, _playerVehicle);
+        }
 
         UpdateStandingsUI();
+        _raceEvents?.RaiseRaceFinished(winner, _racers);
 
         if (_resultsText != null && _standingsText != null)
             _resultsText.text = _standingsText.text;
 
         LogResults();
 
-        _finishWindow.SetActive(true);
+        if (_finishWindow != null)
+        {
+            _finishWindow.SetActive(true);
+            CanvasGroup group = _finishWindow.GetComponent<CanvasGroup>();
+            if (group != null)
+            {
+                group.alpha = 1f;
+                group.interactable = true;
+                group.blocksRaycasts = true;
+            }
+        }
+
         UnlockCursor();
-        StopTime();
+        GameState.Pause();
     }
 
     private void LogResults()
@@ -433,7 +521,6 @@ public class Race : MonoBehaviour
     }
 
 #if UNITY_EDITOR
-    // Видно в Scene без запуска игры: зелёный = старт, красный = финиш.
     private void OnDrawGizmos()
     {
         if (_track == null || _track.Spline == null || _track.Spline.Count < MinKnots) return;
@@ -461,11 +548,8 @@ public class Race : MonoBehaviour
     }
 #endif
 
-    private void StartTime() => Time.timeScale = 1f;
-    private void StopTime() => Time.timeScale = 0f;
-
     private void OnDestroy()
     {
-        StartTime();
+        GameState.Resume();
     }
 }
