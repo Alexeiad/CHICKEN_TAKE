@@ -120,7 +120,7 @@ Material:
     - _RaysStrength: 2
     - _SilverLining: 0.85
     - _SilverRim: 0.9
-    - _SimTime: 15502.144
+    - _SimTime: 8256.009
     - _SkyTime: 1350.9706
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
@@ -191,7 +191,7 @@ Material:
     - _NightZenith: {r: 0.01, g: 0.018, b: 0.049999982, a: 1}
     - _SkyHorizon: {r: 0.68, g: 0.86, b: 0.99, a: 1}
     - _SkyTop: {r: 0.14, g: 0.46, b: 0.92, a: 1}
-    - _SunColor: {r: 1, g: 0.6273585, b: 0.9988592, a: 1}
+    - _SunColor: {r: 1, g: 0.8443396, b: 1, a: 1}
     - _SunGlowColor: {r: 1, g: 0.76, b: 0.43999997, a: 1}
     - _SunRimColor: {r: 1, g: 0.55167866, b: 0.19979917, a: 1}
     - _SunsetColor: {r: 1, g: 0.47999996, b: 0.17999998, a: 1}
