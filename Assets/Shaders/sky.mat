@@ -69,25 +69,29 @@ Material:
     - _BodyAIsMoon: 0
     - _BodyBIsMoon: 1
     - _BumpScale: 1
+    - _CloudAmbient: 1
     - _CloudCover: 0.52
-    - _CloudCoverage: 0.52
+    - _CloudCoverage: 0.616
     - _CloudDetail: 0.06
     - _CloudMorph: 0.06
     - _CloudMorphSpeed: 0.08
-    - _CloudScale: 4
+    - _CloudScale: 2.49
+    - _CloudShadowStrength: 1.5
     - _CloudSoftness: 0.22
-    - _CloudSunLight: 1
-    - _CloudWarp: 0.65
-    - _ColorShiftAmount: 0.06
+    - _CloudSunLight: 0.642
+    - _CloudWarp: 0.73
+    - _ColorShiftAmount: 0.019
     - _ColorShiftSpeed: 2
     - _ColorWaveSpeed: 2
     - _ColorWaveStrength: 0.06
     - _Cutoff: 0.5
+    - _DayGlowMul: 0.35
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
+    - _DuskGlowMul: 1.6
     - _FlareAmount: 0.7
     - _FlareRingsStrength: 0.45
-    - _GlareStrength: 0.75
+    - _GlareStrength: 0.3
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
@@ -95,27 +99,28 @@ Material:
     - _HighCloudCover: 0.45
     - _HighCloudScale: 1.5
     - _HorizonBandSharpness: 7.5
-    - _HorizonGlowStrength: 0.35
+    - _HorizonGlowStrength: 0.99
     - _Metallic: 0
     - _Mode: 0
     - _MoonAlpha: 0.00007874883
     - _MoonCraterDepth: 1.25
-    - _MoonHaloStrength: 1.232
+    - _MoonHaloStrength: 1.41
     - _MoonRadius: 0.018
-    - _MoonSize: 0.024
+    - _MoonSize: 0.0288
     - _MoonSoftness: 0.0025
     - _MoonVisibility: 1
     - _NightAmount: 0.8851422
     - _NightFactor: 0.94138515
+    - _NightGlowMul: 0.06
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _RaysAmount: 0.55
     - _RaysDensity: 24
     - _RaysSpeed: 0.25
-    - _RaysStrength: 0.65
+    - _RaysStrength: 2
     - _SilverLining: 0.85
     - _SilverRim: 0.9
-    - _SimTime: 13498.673
+    - _SimTime: 15502.144
     - _SkyTime: 1350.9706
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
@@ -131,11 +136,11 @@ Material:
     - _StreakStrength: 0.55
     - _SunAlpha: 0
     - _SunBaseSize: 0.011
-    - _SunCoronaStrength: 0.85
+    - _SunCoronaStrength: 0
     - _SunEdgeSoftness: 0.0022
-    - _SunFXStrength: 1
+    - _SunFXStrength: 0.65
     - _SunGlow: 0.55
-    - _SunHorizonBoost: 0.65
+    - _SunHorizonBoost: 2
     - _SunHorizonExpand: 0.6
     - _SunHorizonScale: 0.65
     - _SunRadius: 0.0103
@@ -145,6 +150,7 @@ Material:
     - _SunsetAmount: 0.30979976
     - _SunsetMix: 0.65
     - _TimeOfDay: 0.94569314
+    - _TransitionWidth: 1
     - _TwilightFactor: 0.47557715
     - _UVSec: 0
     - _WispyCoverage: 0.45
@@ -155,7 +161,7 @@ Material:
     - _CloudBright: {r: 1, g: 0.99, b: 0.97, a: 1}
     - _CloudDark: {r: 0.36, g: 0.42, b: 0.54, a: 1}
     - _CloudShadowColor: {r: 0.33999997, g: 0.41999996, b: 0.53999996, a: 1}
-    - _CloudSpeed: {r: 0.03, g: 0.012, b: 0, a: 0}
+    - _CloudSpeed: {r: 0.2, g: 0.1, b: 0, a: 0}
     - _CloudTopColor: {r: 1, g: 0.98999995, b: 0.96999997, a: 1}
     - _CloudWind: {r: 0.025, g: 0.01, b: 0, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
@@ -165,6 +171,9 @@ Material:
     - _DayTop: {r: 0.13999996, g: 0.45999992, b: 0.92, a: 1}
     - _DayTopColor: {r: 0.13999996, g: 0.41999996, b: 0.85, a: 1}
     - _DayZenith: {r: 0.11999995, g: 0.43999997, b: 0.9, a: 1}
+    - _DuskCloudTint: {r: 1.15, g: 0.8, b: 0.72, a: 1}
+    - _DuskHorizon: {r: 1, g: 0.52, b: 0.29999998, a: 1}
+    - _DuskTop: {r: 0.29999998, g: 0.19999996, b: 0.45999992, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _Ground: {r: 0.17999998, g: 0.18999997, b: 0.20999995, a: 1}
     - _GroundColor: {r: 0.23999995, g: 0.21999997, b: 0.19999996, a: 1}
@@ -174,6 +183,7 @@ Material:
     - _MoonColor: {r: 0.78, g: 0.88, b: 1, a: 1}
     - _MoonShadowTint: {r: 0.25999996, g: 0.31999996, b: 0.45999992, a: 1}
     - _NightBottom: {r: 0.049999982, g: 0.079999976, b: 0.15999997, a: 1}
+    - _NightCloudTint: {r: 0.15999997, g: 0.19999996, b: 0.33999997, a: 1}
     - _NightHorizon: {r: 0.044999972, g: 0.07499998, b: 0.14999998, a: 1}
     - _NightHorizonColor: {r: 0.054999977, g: 0.08499997, b: 0.15999997, a: 1}
     - _NightTop: {r: 0.012, g: 0.02, b: 0.054999977, a: 1}
@@ -181,7 +191,7 @@ Material:
     - _NightZenith: {r: 0.01, g: 0.018, b: 0.049999982, a: 1}
     - _SkyHorizon: {r: 0.68, g: 0.86, b: 0.99, a: 1}
     - _SkyTop: {r: 0.14, g: 0.46, b: 0.92, a: 1}
-    - _SunColor: {r: 1, g: 0.96, b: 0.85, a: 1}
+    - _SunColor: {r: 1, g: 0.6273585, b: 0.9988592, a: 1}
     - _SunGlowColor: {r: 1, g: 0.76, b: 0.43999997, a: 1}
     - _SunRimColor: {r: 1, g: 0.55167866, b: 0.19979917, a: 1}
     - _SunsetColor: {r: 1, g: 0.47999996, b: 0.17999998, a: 1}

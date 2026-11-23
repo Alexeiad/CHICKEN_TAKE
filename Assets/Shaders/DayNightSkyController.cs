@@ -41,17 +41,12 @@ public class SkyCycleController : MonoBehaviour
 
     [Header("Время")]
     [Min(0f)] public float timeMultiplier = 1f;
-    [Tooltip("Полная длительность суток в секундах")]
     [Min(10f)] public float fullDaySeconds = 120f;
     [Range(0f, 1f)] public float startTimeOfDay = 0.22f;
     public bool animateInEditMode = true;
 
     [Header("Доля дня и сумерки")]
-    [Tooltip("Какая часть суток солнце находится над горизонтом")]
-    [Range(0.25f, 0.75f)] public float dayLength = 0.52f;
-    [Tooltip("Насколько рано начинаются вечерние цвета до заката")]
     [Range(0.02f, 0.15f)] public float eveningLead = 0.07f;
-    [Tooltip("Насколько рано появляются ночные цвета после заката")]
     [Range(0.01f, 0.12f)] public float nightLead = 0.05f;
     [Range(0.2f, 15f)] public float transitionSmoothness = 1.8f;
 
@@ -59,12 +54,23 @@ public class SkyCycleController : MonoBehaviour
     [Range(-60f, 60f)] public float orbitTilt = 22f;
     [Range(0f, 360f)] public float orbitYaw = 0f;
 
+    [Header("Освещение сцены (чтобы тени не были чёрными)")]
+    [Range(0.15f, 1.5f)] public float minLightIntensity = 0.55f;   // минимальная яркость света
+    [Range(0.0f, 1.5f)] public float ambientIntensity = 0.85f;    // сила ambient
+    public Color ambientDay = new Color(0.55f, 0.62f, 0.75f);
+    public Color ambientEvening = new Color(0.55f, 0.38f, 0.28f);
+    public Color ambientNight = new Color(0.18f, 0.22f, 0.35f);
+
     [Header("Общие настройки")]
     [Range(0.002f, 0.06f)] public float sunSize = 0.011f;
     [Range(0f, 2.0f)] public float sunHorizonBoost = 0.65f;
     [Range(0.006f, 0.09f)] public float moonSize = 0.024f;
     [Range(0f, 1.5f)] public float moonHaloStrength = 0.35f;
     [Range(0.35f, 4.0f)] public float cloudScale = 0.72f;
+    public Vector2 cloudSpeed = new Vector2(0.06f, 0.03f);
+    [Range(0f, 1.5f)] public float cloudWarp = 1.15f;
+    [Range(0f, 1.5f)] public float cloudShadowStrength = 0.40f;
+    [Range(0f, 1f)] public float cloudAmbient = 0.45f;
     [Range(0f, 2.0f)] public float colorShiftSpeed = 0.22f;
     [Range(0f, 0.25f)] public float colorShiftAmount = 0.06f;
 
@@ -77,10 +83,10 @@ public class SkyCycleController : MonoBehaviour
         horizonGlowColor = new Color(1.00f, 0.82f, 0.52f),
         horizonGlowStrength = 0.35f,
         lightColor = new Color(1.00f, 0.96f, 0.85f),
-        lightIntensity = 1.40f,
+        lightIntensity = 1.35f,
         cloudBright = new Color(1.00f, 0.99f, 0.97f),
-        cloudDark = new Color(0.36f, 0.42f, 0.54f),
-        cloudCoverage = 0.68f,
+        cloudDark = new Color(0.48f, 0.52f, 0.61f),
+        cloudCoverage = 0.70f,
         cloudSunLight = 1.00f,
         sunColor = new Color(1.00f, 0.96f, 0.85f),
         sunCoronaStrength = 0.85f,
@@ -97,11 +103,11 @@ public class SkyCycleController : MonoBehaviour
         skyHorizon = new Color(1.00f, 0.45f, 0.15f),
         horizonGlowColor = new Color(1.00f, 0.38f, 0.10f),
         horizonGlowStrength = 1.35f,
-        lightColor = new Color(1.00f, 0.50f, 0.20f),
-        lightIntensity = 1.00f,
+        lightColor = new Color(1.00f, 0.55f, 0.28f),
+        lightIntensity = 0.95f,
         cloudBright = new Color(1.00f, 0.72f, 0.44f),
-        cloudDark = new Color(0.26f, 0.18f, 0.28f),
-        cloudCoverage = 0.72f,
+        cloudDark = new Color(0.40f, 0.34f, 0.42f),
+        cloudCoverage = 0.74f,
         cloudSunLight = 0.90f,
         sunColor = new Color(1.00f, 0.84f, 0.55f),
         sunCoronaStrength = 1.15f,
@@ -118,11 +124,11 @@ public class SkyCycleController : MonoBehaviour
         skyHorizon = new Color(0.045f, 0.075f, 0.155f),
         horizonGlowColor = new Color(0.14f, 0.24f, 0.48f),
         horizonGlowStrength = 0.20f,
-        lightColor = new Color(0.32f, 0.46f, 0.82f),
-        lightIntensity = 0.35f,
-        cloudBright = new Color(0.26f, 0.32f, 0.48f),
-        cloudDark = new Color(0.05f, 0.07f, 0.14f),
-        cloudCoverage = 0.55f,
+        lightColor = new Color(0.45f, 0.55f, 0.85f),
+        lightIntensity = 0.45f,          // было слишком низко
+        cloudBright = new Color(0.30f, 0.36f, 0.52f),
+        cloudDark = new Color(0.14f, 0.16f, 0.24f),
+        cloudCoverage = 0.58f,
         cloudSunLight = 0.00f,
         sunColor = new Color(1.00f, 0.96f, 0.85f),
         sunCoronaStrength = 0.00f,
@@ -145,6 +151,7 @@ public class SkyCycleController : MonoBehaviour
     private double _lastEditorTime;
     private bool _hasEditorTime;
 
+    // Shader property IDs
     private static readonly int SkyTopId = Shader.PropertyToID("_SkyTop");
     private static readonly int SkyHorizonId = Shader.PropertyToID("_SkyHorizon");
     private static readonly int HorizonGlowColorId = Shader.PropertyToID("_HorizonGlowColor");
@@ -161,10 +168,14 @@ public class SkyCycleController : MonoBehaviour
     private static readonly int MoonHaloStrengthId = Shader.PropertyToID("_MoonHaloStrength");
     private static readonly int StarsVisibilityId = Shader.PropertyToID("_StarsVisibility");
     private static readonly int CloudScaleId = Shader.PropertyToID("_CloudScale");
+    private static readonly int CloudSpeedId = Shader.PropertyToID("_CloudSpeed");
+    private static readonly int CloudWarpId = Shader.PropertyToID("_CloudWarp");
     private static readonly int CloudCoverageId = Shader.PropertyToID("_CloudCoverage");
     private static readonly int CloudBrightId = Shader.PropertyToID("_CloudBright");
     private static readonly int CloudDarkId = Shader.PropertyToID("_CloudDark");
     private static readonly int CloudSunLightId = Shader.PropertyToID("_CloudSunLight");
+    private static readonly int CloudShadowStrengthId = Shader.PropertyToID("_CloudShadowStrength");
+    private static readonly int CloudAmbientId = Shader.PropertyToID("_CloudAmbient");
     private static readonly int SimTimeId = Shader.PropertyToID("_SimTime");
     private static readonly int ColorShiftSpeedId = Shader.PropertyToID("_ColorShiftSpeed");
     private static readonly int ColorShiftAmountId = Shader.PropertyToID("_ColorShiftAmount");
@@ -174,8 +185,7 @@ public class SkyCycleController : MonoBehaviour
 
     void OnEnable()
     {
-        if (sunLight == null)
-            sunLight = GetComponent<Light>();
+        if (sunLight == null) sunLight = GetComponent<Light>();
         if (skyboxMaterial == null && RenderSettings.skybox != null)
             skyboxMaterial = RenderSettings.skybox;
 
@@ -193,6 +203,9 @@ public class SkyCycleController : MonoBehaviour
             _currentSwitchedState = dayState;
             _stateInitialized = true;
         }
+
+        // Важно: включаем нормальный ambient
+        RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
 
         _hasEditorTime = false;
 #if UNITY_EDITOR
@@ -213,8 +226,7 @@ public class SkyCycleController : MonoBehaviour
 #if UNITY_EDITOR
     private void OnEditorUpdate()
     {
-        if (Application.isPlaying || this == null)
-            return;
+        if (Application.isPlaying || this == null) return;
 
         double now = EditorApplication.timeSinceStartup;
         if (!_hasEditorTime)
@@ -227,8 +239,7 @@ public class SkyCycleController : MonoBehaviour
         float dt = Mathf.Clamp((float)(now - _lastEditorTime), 0f, 0.1f);
         _lastEditorTime = now;
 
-        if (!animateInEditMode)
-            return;
+        if (!animateInEditMode) return;
 
         UpdateCycle(dt, false);
         SceneView.RepaintAll();
@@ -237,18 +248,14 @@ public class SkyCycleController : MonoBehaviour
 
     void Update()
     {
-        if (!Application.isPlaying)
-            return;
-
+        if (!Application.isPlaying) return;
         UpdateCycle(Mathf.Clamp(Time.deltaTime, 0f, 0.1f), false);
     }
 
     void OnValidate()
     {
-        if (sunLight == null)
-            sunLight = GetComponent<Light>();
-        if (_cachedMoonTex == null)
-            _cachedMoonTex = GenerateMoonTexture(256);
+        if (sunLight == null) sunLight = GetComponent<Light>();
+        if (_cachedMoonTex == null) _cachedMoonTex = GenerateMoonTexture(256);
         UpdateCycle(0f, true);
     }
 
@@ -272,9 +279,7 @@ public class SkyCycleController : MonoBehaviour
         currentStateName = targetState.name;
 
         if (snapState || rawDt <= 0f)
-        {
             _currentSwitchedState = targetState;
-        }
         else
         {
             float step = transitionSmoothness * rawDt;
@@ -284,89 +289,78 @@ public class SkyCycleController : MonoBehaviour
         if (skyboxMaterial != null && RenderSettings.skybox != skyboxMaterial)
             RenderSettings.skybox = skyboxMaterial;
 
+        // === Освещение сцены ===
         if (sunLight != null)
         {
-            Vector3 activeDir = toSun.y >= -0.02f ? toSun : toMoon;
+            // Направление
+            Vector3 activeDir = toSun.y >= -0.05f ? toSun : toMoon;
             sunLight.transform.rotation = Quaternion.LookRotation(-activeDir, Vector3.up);
+
+            // Цвет и интенсивность (с минимальным порогом)
             sunLight.color = _currentSwitchedState.lightColor;
-            sunLight.intensity = _currentSwitchedState.lightIntensity;
+            float intensity = Mathf.Max(_currentSwitchedState.lightIntensity, minLightIntensity);
+            sunLight.intensity = intensity;
+
+            // Чтобы тени не были слишком жёсткими
+            sunLight.shadowStrength = 0.75f;
         }
 
+        // Ambient (очень важно против чёрных теней)
+        Color targetAmbient = ambientDay;
+        if (currentStateName == "Evening") targetAmbient = ambientEvening;
+        else if (currentStateName == "Night") targetAmbient = ambientNight;
+
+        RenderSettings.ambientLight = targetAmbient * ambientIntensity;
+        RenderSettings.ambientIntensity = 1f;
+
+        // === Передаём данные в шейдер ===
         if (skyboxMaterial != null)
         {
             if (_cachedMoonTex != null && skyboxMaterial.HasProperty(MoonTexId) &&
                 skyboxMaterial.GetTexture(MoonTexId) != _cachedMoonTex)
                 skyboxMaterial.SetTexture(MoonTexId, _cachedMoonTex);
 
-            if (skyboxMaterial.HasProperty(HasScriptDataId))
-                skyboxMaterial.SetFloat(HasScriptDataId, 1f);
-            if (skyboxMaterial.HasProperty(SimTimeId))
-                skyboxMaterial.SetFloat(SimTimeId, simTime);
-            if (skyboxMaterial.HasProperty(SunDirId))
-                skyboxMaterial.SetVector(SunDirId, new Vector4(toSun.x, toSun.y, toSun.z, 0f));
-            if (skyboxMaterial.HasProperty(MoonDirId))
-                skyboxMaterial.SetVector(MoonDirId, new Vector4(toMoon.x, toMoon.y, toMoon.z, 0f));
+            if (skyboxMaterial.HasProperty(HasScriptDataId)) skyboxMaterial.SetFloat(HasScriptDataId, 1f);
+            if (skyboxMaterial.HasProperty(SimTimeId)) skyboxMaterial.SetFloat(SimTimeId, simTime);
+            if (skyboxMaterial.HasProperty(SunDirId)) skyboxMaterial.SetVector(SunDirId, toSun);
+            if (skyboxMaterial.HasProperty(MoonDirId)) skyboxMaterial.SetVector(MoonDirId, toMoon);
 
-            if (skyboxMaterial.HasProperty(SkyTopId))
-                skyboxMaterial.SetColor(SkyTopId, _currentSwitchedState.skyTop);
-            if (skyboxMaterial.HasProperty(SkyHorizonId))
-                skyboxMaterial.SetColor(SkyHorizonId, _currentSwitchedState.skyHorizon);
-            if (skyboxMaterial.HasProperty(HorizonGlowColorId))
-                skyboxMaterial.SetColor(HorizonGlowColorId, _currentSwitchedState.horizonGlowColor);
-            if (skyboxMaterial.HasProperty(HorizonGlowStrengthId))
-                skyboxMaterial.SetFloat(HorizonGlowStrengthId, _currentSwitchedState.horizonGlowStrength);
+            if (skyboxMaterial.HasProperty(SkyTopId)) skyboxMaterial.SetColor(SkyTopId, _currentSwitchedState.skyTop);
+            if (skyboxMaterial.HasProperty(SkyHorizonId)) skyboxMaterial.SetColor(SkyHorizonId, _currentSwitchedState.skyHorizon);
+            if (skyboxMaterial.HasProperty(HorizonGlowColorId)) skyboxMaterial.SetColor(HorizonGlowColorId, _currentSwitchedState.horizonGlowColor);
+            if (skyboxMaterial.HasProperty(HorizonGlowStrengthId)) skyboxMaterial.SetFloat(HorizonGlowStrengthId, _currentSwitchedState.horizonGlowStrength);
 
-            if (skyboxMaterial.HasProperty(SunColorId))
-                skyboxMaterial.SetColor(SunColorId, _currentSwitchedState.sunColor);
-            if (skyboxMaterial.HasProperty(SunSizeId))
-                skyboxMaterial.SetFloat(SunSizeId, sunSize);
-            if (skyboxMaterial.HasProperty(SunHorizonBoostId))
-                skyboxMaterial.SetFloat(SunHorizonBoostId, sunHorizonBoost);
-            if (skyboxMaterial.HasProperty(SunCoronaStrengthId))
-                skyboxMaterial.SetFloat(SunCoronaStrengthId, _currentSwitchedState.sunCoronaStrength);
-            if (skyboxMaterial.HasProperty(SunFXStrengthId))
-                skyboxMaterial.SetFloat(SunFXStrengthId, _currentSwitchedState.sunFXStrength);
-            if (skyboxMaterial.HasProperty(RaysStrengthId))
-                skyboxMaterial.SetFloat(RaysStrengthId, _currentSwitchedState.raysStrength);
-            if (skyboxMaterial.HasProperty(GlareStrengthId))
-                skyboxMaterial.SetFloat(GlareStrengthId, _currentSwitchedState.glareStrength);
+            if (skyboxMaterial.HasProperty(SunColorId)) skyboxMaterial.SetColor(SunColorId, _currentSwitchedState.sunColor);
+            if (skyboxMaterial.HasProperty(SunSizeId)) skyboxMaterial.SetFloat(SunSizeId, sunSize);
+            if (skyboxMaterial.HasProperty(SunHorizonBoostId)) skyboxMaterial.SetFloat(SunHorizonBoostId, sunHorizonBoost);
+            if (skyboxMaterial.HasProperty(SunCoronaStrengthId)) skyboxMaterial.SetFloat(SunCoronaStrengthId, _currentSwitchedState.sunCoronaStrength);
+            if (skyboxMaterial.HasProperty(SunFXStrengthId)) skyboxMaterial.SetFloat(SunFXStrengthId, _currentSwitchedState.sunFXStrength);
+            if (skyboxMaterial.HasProperty(RaysStrengthId)) skyboxMaterial.SetFloat(RaysStrengthId, _currentSwitchedState.raysStrength);
+            if (skyboxMaterial.HasProperty(GlareStrengthId)) skyboxMaterial.SetFloat(GlareStrengthId, _currentSwitchedState.glareStrength);
 
-            if (skyboxMaterial.HasProperty(MoonSizeId))
-                skyboxMaterial.SetFloat(MoonSizeId, moonSize);
-            if (skyboxMaterial.HasProperty(MoonHaloStrengthId))
-                skyboxMaterial.SetFloat(MoonHaloStrengthId, moonHaloStrength);
-            if (skyboxMaterial.HasProperty(StarsVisibilityId))
-                skyboxMaterial.SetFloat(StarsVisibilityId, _currentSwitchedState.starsVisibility);
+            if (skyboxMaterial.HasProperty(MoonSizeId)) skyboxMaterial.SetFloat(MoonSizeId, moonSize);
+            if (skyboxMaterial.HasProperty(MoonHaloStrengthId)) skyboxMaterial.SetFloat(MoonHaloStrengthId, moonHaloStrength);
+            if (skyboxMaterial.HasProperty(StarsVisibilityId)) skyboxMaterial.SetFloat(StarsVisibilityId, _currentSwitchedState.starsVisibility);
 
-            if (skyboxMaterial.HasProperty(CloudScaleId))
-                skyboxMaterial.SetFloat(CloudScaleId, cloudScale);
-            if (skyboxMaterial.HasProperty(CloudCoverageId))
-                skyboxMaterial.SetFloat(CloudCoverageId, _currentSwitchedState.cloudCoverage);
-            if (skyboxMaterial.HasProperty(CloudBrightId))
-                skyboxMaterial.SetColor(CloudBrightId, _currentSwitchedState.cloudBright);
-            if (skyboxMaterial.HasProperty(CloudDarkId))
-                skyboxMaterial.SetColor(CloudDarkId, _currentSwitchedState.cloudDark);
-            if (skyboxMaterial.HasProperty(CloudSunLightId))
-                skyboxMaterial.SetFloat(CloudSunLightId, _currentSwitchedState.cloudSunLight);
+            if (skyboxMaterial.HasProperty(CloudScaleId)) skyboxMaterial.SetFloat(CloudScaleId, cloudScale);
+            if (skyboxMaterial.HasProperty(CloudSpeedId)) skyboxMaterial.SetVector(CloudSpeedId, new Vector4(cloudSpeed.x, cloudSpeed.y, 0, 0));
+            if (skyboxMaterial.HasProperty(CloudWarpId)) skyboxMaterial.SetFloat(CloudWarpId, cloudWarp);
+            if (skyboxMaterial.HasProperty(CloudCoverageId)) skyboxMaterial.SetFloat(CloudCoverageId, _currentSwitchedState.cloudCoverage);
+            if (skyboxMaterial.HasProperty(CloudBrightId)) skyboxMaterial.SetColor(CloudBrightId, _currentSwitchedState.cloudBright);
+            if (skyboxMaterial.HasProperty(CloudDarkId)) skyboxMaterial.SetColor(CloudDarkId, _currentSwitchedState.cloudDark);
+            if (skyboxMaterial.HasProperty(CloudSunLightId)) skyboxMaterial.SetFloat(CloudSunLightId, _currentSwitchedState.cloudSunLight);
+            if (skyboxMaterial.HasProperty(CloudShadowStrengthId)) skyboxMaterial.SetFloat(CloudShadowStrengthId, cloudShadowStrength);
+            if (skyboxMaterial.HasProperty(CloudAmbientId)) skyboxMaterial.SetFloat(CloudAmbientId, cloudAmbient);
 
-            if (skyboxMaterial.HasProperty(ColorShiftSpeedId))
-                skyboxMaterial.SetFloat(ColorShiftSpeedId, colorShiftSpeed);
-            if (skyboxMaterial.HasProperty(ColorShiftAmountId))
-                skyboxMaterial.SetFloat(ColorShiftAmountId, colorShiftAmount);
+            if (skyboxMaterial.HasProperty(ColorShiftSpeedId)) skyboxMaterial.SetFloat(ColorShiftSpeedId, colorShiftSpeed);
+            if (skyboxMaterial.HasProperty(ColorShiftAmountId)) skyboxMaterial.SetFloat(ColorShiftAmountId, colorShiftAmount);
         }
     }
 
     private SkyState PickTargetState(float sunY)
     {
-        float eveningThreshold = eveningLead;
-        float nightThreshold = -nightLead;
-
-        if (sunY > eveningThreshold)
-            return dayState;
-
-        if (sunY > nightThreshold)
-            return eveningState;
-
+        if (sunY > eveningLead) return dayState;
+        if (sunY > -nightLead) return eveningState;
         return nightState;
     }
 
