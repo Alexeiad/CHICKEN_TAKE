@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 2100000, guid: cda4a28cd02e99f4f8a12949dee6c6d3, type: 2}
+  m_SkyboxMaterial: {fileID: 2100000, guid: f2b1cfade72f4414fbaf8482ad8b5b4e, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -4459,6 +4459,18 @@ PrefabInstance:
       propertyPath: _data
       value: 
       objectReference: {fileID: 11400000, guid: ad0cc6468d52cd4419034d8b1d1f01ad, type: 2}
+    - target: {fileID: 647743550946930542, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 647743550946930542, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: _currentLane
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 647743550946930542, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: _splineContainer
+      value: 
+      objectReference: {fileID: 959740437}
     - target: {fileID: 888793556825855375, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
       propertyPath: _sellPoint
       value: 
@@ -4560,6 +4572,10 @@ PrefabInstance:
       value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
       propertyPath: splineIndex
       value: 0
       objectReference: {fileID: 0}
@@ -4568,7 +4584,15 @@ PrefabInstance:
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: _baseLookAhead
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
       propertyPath: splineContainer
+      value: 
+      objectReference: {fileID: 959740437}
+    - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: _splineContainer
       value: 
       objectReference: {fileID: 959740437}
     - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
@@ -4577,6 +4601,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
       propertyPath: stuckSpeedThreshold
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: _stuckSpeedThreshold
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
@@ -4592,7 +4620,19 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: _maxLaneChangeCooldown
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: _minLaneChangeCooldown
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
       propertyPath: trackWaypoints.Array.data[0]
+      value: 
+      objectReference: {fileID: 339897847}
+    - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: _trackWaypoints.Array.data[0]
       value: 
       objectReference: {fileID: 339897847}
     - target: {fileID: 8180984788940432802, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
@@ -6542,6 +6582,18 @@ PrefabInstance:
       propertyPath: _data
       value: 
       objectReference: {fileID: 11400000, guid: ad0cc6468d52cd4419034d8b1d1f01ad, type: 2}
+    - target: {fileID: 647743550946930542, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 647743550946930542, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: _currentLane
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 647743550946930542, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: _splineContainer
+      value: 
+      objectReference: {fileID: 959740437}
     - target: {fileID: 888793556825855375, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
       propertyPath: _sellPoint
       value: 
@@ -6643,6 +6695,10 @@ PrefabInstance:
       value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
       propertyPath: splineIndex
       value: 1
       objectReference: {fileID: 0}
@@ -6651,11 +6707,23 @@ PrefabInstance:
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: _baseLookAhead
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
       propertyPath: splineContainer
       value: 
       objectReference: {fileID: 959740437}
     - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: _splineContainer
+      value: 
+      objectReference: {fileID: 959740437}
+    - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
       propertyPath: stuckSpeedThreshold
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: _stuckSpeedThreshold
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
@@ -6671,7 +6739,19 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: _maxLaneChangeCooldown
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: _minLaneChangeCooldown
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
       propertyPath: trackWaypoints.Array.data[0]
+      value: 
+      objectReference: {fileID: 339897847}
+    - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: _trackWaypoints.Array.data[0]
       value: 
       objectReference: {fileID: 339897847}
     - target: {fileID: 8180984788940432802, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
@@ -7983,6 +8063,18 @@ PrefabInstance:
       propertyPath: _data
       value: 
       objectReference: {fileID: 11400000, guid: ad0cc6468d52cd4419034d8b1d1f01ad, type: 2}
+    - target: {fileID: 647743550946930542, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 647743550946930542, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: _currentLane
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 647743550946930542, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: _splineContainer
+      value: 
+      objectReference: {fileID: 959740437}
     - target: {fileID: 888793556825855375, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
       propertyPath: _sellPoint
       value: 
@@ -8084,7 +8176,15 @@ PrefabInstance:
       value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
       propertyPath: baseLookAhead
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: _baseLookAhead
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
@@ -8092,7 +8192,15 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 959740437}
     - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: _splineContainer
+      value: 
+      objectReference: {fileID: 959740437}
+    - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
       propertyPath: stuckSpeedThreshold
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: _stuckSpeedThreshold
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
@@ -8108,7 +8216,19 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: _maxLaneChangeCooldown
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: _minLaneChangeCooldown
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
       propertyPath: trackWaypoints.Array.data[0]
+      value: 
+      objectReference: {fileID: 339897847}
+    - target: {fileID: 6615251593952713912, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}
+      propertyPath: _trackWaypoints.Array.data[0]
       value: 
       objectReference: {fileID: 339897847}
     - target: {fileID: 8180984788940432802, guid: 05fddb8f28236084ea99f294a3f5aa42, type: 3}

@@ -2654,7 +2654,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameSettings: {fileID: 11400000, guid: 3c1694854b700d74ca4ecfeb33643a77, type: 2}
   vehicleSettings: {fileID: 11400000, guid: 82a203c75abc9624dacbe12152d113a9, type: 2}
-  playerData: {fileID: 0}
+  playerData: {fileID: 11400000, guid: 58e8306aa9e94914a9e6e1ecc66b5d3e, type: 2}
   toggleKey: 282
   startOpened: 0
   defaultLanguage: 0
